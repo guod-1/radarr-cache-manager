@@ -1,66 +1,48 @@
-"""
-Dashboard Router
-Main dashboard page showing overview and quick stats
-"""
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import logging
-
-from app.core.config import get_user_settings
-from app.services.exclusions import get_exclusion_manager
-from app.core.scheduler import get_scheduler
 from app.services.radarr import get_radarr_client
 from app.services.sonarr import get_sonarr_client
-from app.services.ca_mover import get_ca_mover_monitor
+from app.services.exclusions import get_exclusion_manager
+from app.core.scheduler import get_scheduler
+import logging
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
-
 @router.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
-    """Main dashboard page"""
-    user_settings = get_user_settings()
+    """Dashboard home page"""
+    
+    # 1. Check Radarr
+    radarr_connected = False
+    try:
+        radarr_connected = get_radarr_client().test_connection()
+    except Exception:
+        pass
+
+    # 2. Check Sonarr
+    sonarr_connected = False
+    try:
+        sonarr_connected = get_sonarr_client().test_connection()
+    except Exception:
+        pass
+
+    # 3. Get Exclusion Stats
     exclusion_manager = get_exclusion_manager()
-    scheduler = get_scheduler()
-    
-    # Test connections
-    radarr_client = get_radarr_client()
-    sonarr_client = get_sonarr_client()
-    radarr_connected = radarr_client.test_connection()
-    sonarr_connected = sonarr_client.test_connection()
-    
-    # Get stats
     exclusion_stats = exclusion_manager.get_exclusion_stats()
-    next_run = scheduler.get_next_run_time() if user_settings.scheduler.enabled else "Disabled"
     
-    # Get CA Mover status
-    ca_monitor = get_ca_mover_monitor()
-    ca_status = ca_monitor.parse_log()
-    
-    context = {
-        "request": request,
+    # 4. Compile Stats for Template
+    # We use .get('total_count', 0) to be safe even if the key is missing
+    stats = {
         "radarr_connected": radarr_connected,
-        "radarr_url": user_settings.radarr.url,
         "sonarr_connected": sonarr_connected,
-        "sonarr_url": user_settings.sonarr.url,
-        "scheduler_enabled": user_settings.scheduler.enabled,
-        "next_run": next_run,
-        "exclusion_count": exclusion_stats['total'],
-        "exclusion_files": exclusion_stats['files'],
-        "exclusion_dirs": exclusion_stats['directories'],
-        "radarr_tag_search_id": user_settings.radarr_tag_operation.search_tag_id,
-        "radarr_tag_replace_id": user_settings.radarr_tag_operation.replace_tag_id,
-        "sonarr_tag_search_id": user_settings.sonarr_tag_operation.search_tag_id,
-        "sonarr_tag_replace_id": user_settings.sonarr_tag_operation.replace_tag_id,
-        "custom_folder_count": len(user_settings.exclusions.custom_folders),
-        "exclude_tag_count": len(user_settings.exclusions.exclude_tag_ids),
-        "ca_mover_status": ca_status["status"],
-        "ca_mover_excluded": ca_status["files_excluded"],
-        "ca_mover_last_run": ca_status["last_run"],
+        "exclusion_count": exclusion_stats.get('total_count', 0),
+        "file_size": exclusion_stats.get('file_size', 0)
     }
-    
-    return templates.TemplateResponse("dashboard.html", context)
+
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "stats": stats
+    })
