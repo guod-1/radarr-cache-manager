@@ -17,13 +17,13 @@ class ExclusionManager:
         all_paths = set()
 
         # A. Add Manual Folder Exclusions from Settings
-        # FIX: Use 'exclusions.custom_folders'
+        # FIX: Corrected variable name to 'exclusions.custom_folders'
         if self.settings.exclusions.custom_folders:
             for folder in self.settings.exclusions.custom_folders:
                 all_paths.add(folder.strip())
 
         # B. Add PlexCache-D Exclusions
-        # FIX: Use 'exclusions.plexcache_file_path'
+        # FIX: Corrected variable name to 'exclusions.plexcache_file_path'
         plex_cache_file = Path(self.settings.exclusions.plexcache_file_path)
         if plex_cache_file.exists():
             with open(plex_cache_file, 'r') as f:
