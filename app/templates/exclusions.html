@@ -98,6 +98,14 @@
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Path to PlexCache-D's unraid_mover_exclusions.txt file</p>
             </div>
 
+            <!-- CA Mover Tuning Log Path -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">CA Mover Tuning Log Path</label>
+                <input type="text" name="ca_mover_log_path" value="{{ user_settings.exclusions.ca_mover_log_path }}"
+                    class="block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 font-mono text-sm text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500">
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Path to CA Mover Tuning log directory (ca.mover.tuning folder)</p>
+            </div>
+
             <button type="submit"
                 class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
                 Save Exclusion Settings
