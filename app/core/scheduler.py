@@ -61,11 +61,16 @@ class CacheScheduler:
         """Execute the cache manager operation"""
         # Import here to avoid circular dependencies
         from app.services.operations import run_full_operation
-from app.services.ca_mover_scheduler import check_ca_mover_logs
+        from app.services.ca_mover_scheduler import check_ca_mover_logs
         
         logger.info("Scheduled run started")
         try:
+            # Run the main operation
             result = run_full_operation()
+            
+            # Run the CA Mover check
+            check_ca_mover_logs()
+            
             logger.info(f"Scheduled run completed: {result}")
         except Exception as e:
             logger.error(f"Scheduled run failed: {e}")
@@ -93,5 +98,4 @@ scheduler = CacheScheduler()
 
 
 def get_scheduler() -> CacheScheduler:
-    """Dependency for FastAPI routes"""
     return scheduler
