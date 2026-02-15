@@ -76,6 +76,25 @@
     <div class="bg-white shadow rounded-lg p-6 mb-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Exclusion Settings</h3>
         
+        <!-- Output File Info -->
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Exclusions Output File</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <p class="font-mono text-xs bg-white px-2 py-1 rounded border border-blue-200 inline-block">
+                            /mnt/user/scripts/mover_exclusions.txt
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <form action="/settings/exclusions" method="post" class="space-y-6">
             <!-- Custom Folders -->
             <div>
@@ -86,18 +105,46 @@
                 <p class="mt-1 text-sm text-gray-500">One path per line. These folders will always be excluded from mover.</p>
             </div>
 
-            <!-- Tags to Exclude -->
+            <!-- Tags to Exclude - Improved UI -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Exclude Movies with Tags</label>
-                <select name="exclude_tag_ids" multiple size="5"
-                    class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
-                    {% for tag in tags %}
-                    <option value="{{ tag.id }}" {% if tag.id in settings.exclusions.exclude_tag_ids %}selected{% endif %}>
-                        {{ tag.label }} (ID: {{ tag.id }})
-                    </option>
+                
+                <!-- Add Tag Selector -->
+                <div class="flex gap-2 mb-3">
+                    <select id="tag-selector" class="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        <option value="">-- Select a tag to add --</option>
+                        {% for tag in tags %}
+                        <option value="{{ tag.id }}" data-label="{{ tag.label }}">
+                            {{ tag.label }} (ID: {{ tag.id }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" onclick="addTag()" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                        Add Tag
+                    </button>
+                </div>
+
+                <!-- Selected Tags List -->
+                <div id="selected-tags" class="space-y-2 mb-3">
+                    {% for tag_id in settings.exclusions.exclude_tag_ids %}
+                    {% set tag_info = tags|selectattr('id', 'equalto', tag_id)|first %}
+                    <div class="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-md tag-item" data-tag-id="{{ tag_id }}">
+                        <span class="text-sm">
+                            <strong>{{ tag_info.label if tag_info else 'Unknown' }}</strong> (ID: {{ tag_id }})
+                        </span>
+                        <button type="button" onclick="removeTag({{ tag_id }})" 
+                            class="text-red-600 hover:text-red-800 text-sm font-medium">
+                            Remove
+                        </button>
+                    </div>
                     {% endfor %}
-                </select>
-                <p class="mt-1 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple. Movies with these tags will be added to exclusions.</p>
+                </div>
+
+                <!-- Hidden input to store tag IDs -->
+                <input type="hidden" name="exclude_tag_ids" id="exclude-tag-ids" value="{{ ','.join(settings.exclusions.exclude_tag_ids|map('string')) }}">
+                
+                <p class="text-sm text-gray-500">Movies with these tags will be added to exclusions.</p>
             </div>
 
             <!-- PlexCache-D File -->
@@ -137,10 +184,59 @@
         </form>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
+    function addTag() {
+        const selector = document.getElementById('tag-selector');
+        const tagId = selector.value;
+        const tagLabel = selector.options[selector.selectedIndex].dataset.label;
+        
+        if (!tagId) return;
+        
+        // Check if already added
+        if (document.querySelector(`.tag-item[data-tag-id="${tagId}"]`)) {
+            alert('This tag is already added');
+            return;
+        }
+        
+        // Add to list
+        const tagsList = document.getElementById('selected-tags');
+        const tagItem = document.createElement('div');
+        tagItem.className = 'flex items-center justify-between bg-gray-100 px-3 py-2 rounded-md tag-item';
+        tagItem.dataset.tagId = tagId;
+        tagItem.innerHTML = `
+            <span class="text-sm">
+                <strong>${tagLabel}</strong> (ID: ${tagId})
+            </span>
+            <button type="button" onclick="removeTag(${tagId})" 
+                class="text-red-600 hover:text-red-800 text-sm font-medium">
+                Remove
+            </button>
+        `;
+        tagsList.appendChild(tagItem);
+        
+        // Update hidden input
+        updateHiddenInput();
+        
+        // Reset selector
+        selector.value = '';
+    }
+    
+    function removeTag(tagId) {
+        const tagItem = document.querySelector(`.tag-item[data-tag-id="${tagId}"]`);
+        if (tagItem) {
+            tagItem.remove();
+            updateHiddenInput();
+        }
+    }
+    
+    function updateHiddenInput() {
+        const tagItems = document.querySelectorAll('.tag-item');
+        const tagIds = Array.from(tagItems).map(item => item.dataset.tagId);
+        document.getElementById('exclude-tag-ids').value = tagIds.join(',');
+    }
+    
+    // HTMX success handler
     document.body.addEventListener('htmx:afterRequest', function(event) {
         if (event.detail.successful) {
             const url = event.detail.xhr.responseURL;
