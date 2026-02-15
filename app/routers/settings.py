@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from app.core.config import get_user_settings, save_user_settings, UserSettings
+from app.core.config import get_user_settings, save_user_settings
+from app.services.radarr import get_radarr_client
+from app.services.sonarr import get_sonarr_client
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,26 +18,44 @@ async def settings_page(request: Request):
         "settings": settings
     })
 
-@router.post("/save")
-async def save_settings(
-    radarr_url: str = Form(...),
-    radarr_key: str = Form(...),
-    sonarr_url: str = Form(...),
-    sonarr_key: str = Form(...),
-    scheduler_enabled: bool = Form(False),
-    cron_expression: str = Form("0 */6 * * *")
-):
+@router.post("/radarr/save")
+async def save_radarr(url: str = Form(...), api_key: str = Form(...)):
     settings = get_user_settings()
+    settings.radarr.url = url
+    settings.radarr.api_key = api_key
     
-    # Update Radarr/Sonarr while preserving last_sync timestamps
-    settings.radarr.url = radarr_url
-    settings.radarr.api_key = radarr_key
-    settings.sonarr.url = sonarr_url
-    settings.sonarr.api_key = sonarr_key
-    
-    # Update Scheduler
-    settings.scheduler.enabled = scheduler_enabled
-    settings.scheduler.cron_expression = cron_expression
+    status = "error"
+    try:
+        # Test connection
+        get_radarr_client().get_all_tags()
+        status = "success"
+    except Exception as e:
+        logger.error(f"Radarr connection test failed: {e}")
     
     save_user_settings(settings)
-    return RedirectResponse(url="/settings?success=true", status_code=303)
+    return RedirectResponse(url=f"/settings?radarr_status={status}", status_code=303)
+
+@router.post("/sonarr/save")
+async def save_sonarr(url: str = Form(...), api_key: str = Form(...)):
+    settings = get_user_settings()
+    settings.sonarr.url = url
+    settings.sonarr.api_key = api_key
+    
+    status = "error"
+    try:
+        # Test connection
+        get_sonarr_client().get_all_tags()
+        status = "success"
+    except Exception as e:
+        logger.error(f"Sonarr connection test failed: {e}")
+    
+    save_user_settings(settings)
+    return RedirectResponse(url=f"/settings?sonarr_status={status}", status_code=303)
+
+@router.post("/automation/save")
+async def save_automation(scheduler_enabled: bool = Form(False), cron_expression: str = Form(...)):
+    settings = get_user_settings()
+    settings.scheduler.enabled = scheduler_enabled
+    settings.scheduler.cron_expression = cron_expression
+    save_user_settings(settings)
+    return RedirectResponse(url="/settings?automation_status=success", status_code=303)
