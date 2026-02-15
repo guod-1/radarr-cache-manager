@@ -93,7 +93,7 @@ def run_exclusion_builder() -> Dict[str, Any]:
     """Build exclusions from all sources"""
     try:
         exclusion_manager = get_exclusion_manager()
-        result = exclusion_manager.generate_exclusions()
+        result = exclusion_manager.combine_exclusions()
         return {"success": True, **result}
     except Exception as e:
         logger.error(f"Exclusion builder failed: {e}")
