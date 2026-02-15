@@ -7,9 +7,18 @@ from fastapi.responses import RedirectResponse
 
 from app.core.config import get_user_settings
 from app.core.scheduler import get_scheduler
-from app.routers import dashboard, settings, movies, shows, logs, operations, exclusions, stats
+from app.routers import (
+    dashboard, 
+    settings, 
+    movies, 
+    shows, 
+    logs, 
+    operations, 
+    exclusions, 
+    stats
+)
 
-# Initialize Logging to File
+# Initialize Logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -23,9 +32,10 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="Mover Tuning Exclusion Manager")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Include all routers
+# Include all routers correctly
 app.include_router(dashboard.router, tags=["Dashboard"])
-app.include_router(exclusions, stats.router, prefix="/exclusions", tags=["Exclusions"])
+app.include_router(exclusions.router, prefix="/exclusions", tags=["Exclusions"])
+app.include_router(stats.router, prefix="/stats", tags=["Stats"])
 app.include_router(movies.router, prefix="/movies", tags=["Movies"])
 app.include_router(shows.router, prefix="/shows", tags=["Shows"])
 app.include_router(settings.router, prefix="/settings", tags=["Settings"])
