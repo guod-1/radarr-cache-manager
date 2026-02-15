@@ -5,6 +5,10 @@ from typing import List, Optional
 
 CONFIG_PATH = "/config/settings.json"
 
+class RadarrTagOperation(BaseModel):
+    tag_id: int
+    action: str  # e.g., "exclude"
+
 class ExclusionSettings(BaseModel):
     custom_folders: List[str] = []
     exclude_tag_ids: List[int] = []
