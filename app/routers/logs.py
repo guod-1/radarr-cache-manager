@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 import os
 import logging
@@ -11,17 +11,20 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/", response_class=HTMLResponse)
 async def logs_page(request: Request):
+    """View the last 200 lines of the application log"""
     log_content = ""
+    # Use the standard log path
     log_path = "/config/app.log"
+    
     if os.path.exists(log_path):
         try:
             with open(log_path, "r") as f:
-                # Read last 200 lines for the UI
-                log_content = "".join(f.readlines()[-200:])
+                lines = f.readlines()
+                log_content = "".join(lines[-200:])
         except Exception as e:
-            log_content = f"Error reading logs: {e}"
+            log_content = f"Error reading logs: {str(e)}"
     else:
-        log_content = "No log file found yet."
+        log_content = "Log file not found at /config/app.log"
 
     return templates.TemplateResponse("logs.html", {
         "request": request,
@@ -30,15 +33,8 @@ async def logs_page(request: Request):
 
 @router.get("/download")
 async def download_logs():
+    """Download the full log file"""
     log_path = "/config/app.log"
     if os.path.exists(log_path):
         return FileResponse(log_path, filename="mover_manager.log")
     return {"error": "Log file not found"}
-
-@router.post("/clear", response_class=HTMLResponse)
-async def clear_logs():
-    log_path = "/config/app.log"
-    if os.path.exists(log_path):
-        with open(log_path, "w") as f:
-            f.write("")
-    return '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">Logs cleared successfully</div>'
