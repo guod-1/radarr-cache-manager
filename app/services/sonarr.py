@@ -74,16 +74,15 @@ class SonarrClient:
         """Get all file paths for a series"""
         files = []
         
-        # Get all episodes for this series
-        episodes = self._request('GET', f'episode', params={'seriesId': series_id})
-        if not episodes:
+        # Get episode files for this series
+        episode_files = self._request('GET', 'episodefile', params={'seriesId': series_id})
+        if not episode_files:
             return []
         
-        for episode in episodes:
-            if episode.get('hasFile') and episode.get('episodeFile'):
-                file_path = episode['episodeFile'].get('path')
-                if file_path:
-                    files.append(file_path)
+        for ep_file in episode_files:
+            file_path = ep_file.get('path')
+            if file_path:
+                files.append(file_path)
         
         return files
 
