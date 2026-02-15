@@ -1,4 +1,3 @@
-"""
 Settings Router
 Handles all settings management
 """
