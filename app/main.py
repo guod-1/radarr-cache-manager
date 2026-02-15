@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 
 from app.core.config import get_user_settings
 from app.core.scheduler import get_scheduler
-from app.routers import dashboard, settings, movies, shows, logs, operations, exclusions
+from app.routers import dashboard, settings, movies, shows, logs, operations, exclusions, stats
 
 # Initialize Logging to File
 logging.basicConfig(
@@ -25,7 +25,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Include all routers
 app.include_router(dashboard.router, tags=["Dashboard"])
-app.include_router(exclusions.router, prefix="/exclusions", tags=["Exclusions"])
+app.include_router(exclusions, stats.router, prefix="/exclusions", tags=["Exclusions"])
 app.include_router(movies.router, prefix="/movies", tags=["Movies"])
 app.include_router(shows.router, prefix="/shows", tags=["Shows"])
 app.include_router(settings.router, prefix="/settings", tags=["Settings"])

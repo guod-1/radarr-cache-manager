@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Mover Performance Statistics</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-sm font-medium text-gray-500 uppercase">Efficiency</h3>
+            <p class="mt-2 text-3xl font-bold text-indigo-600">
+                {% if mover and (mover.excluded + mover.moved) > 0 %}
+                    {{ ((mover.excluded / (mover.excluded + mover.moved)) * 100) | round(1) }}%
+                {% else %}0%{% endif %}
+            </p>
+            <p class="text-xs text-gray-400 mt-1">Percentage of files kept on Cache</p>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-sm font-medium text-gray-500 uppercase">Files Stayed</h3>
+            <p class="mt-2 text-3xl font-bold text-green-600">{{ mover.excluded if mover else 0 }}</p>
+            <p class="text-xs text-gray-400 mt-1">Paths ignored by Mover</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-sm font-medium text-gray-500 uppercase">Files Moved</h3>
+            <p class="mt-2 text-3xl font-bold text-orange-600">{{ mover.moved if mover else 0 }}</p>
+            <p class="text-xs text-gray-400 mt-1">Paths transferred to Array</p>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold">Latest Log Analysis</h3>
+            <p class="text-xs text-gray-500">Source: {{ mover.filename if mover else 'None' }}</p>
+        </div>
+        <div class="p-6">
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+                During the last run on <strong>{{ mover.timestamp | datetime if mover else 'N/A' }}</strong>, 
+                the Mover Tuning plugin identified <strong>{{ mover.excluded }}</strong> files that matched 
+                your exclusion criteria. These files remain on your high-speed storage.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
