@@ -15,7 +15,7 @@ from pathlib import Path
 
 from app.core.config import settings, get_user_settings
 from app.core.scheduler import scheduler
-from app.routers import dashboard, settings as settings_router, movies, logs, operations, exclusions
+from app.routers import dashboard, settings as settings_router, movies, shows, logs, operations, exclusions
 
 # Set up logging
 logging.basicConfig(
@@ -69,6 +69,7 @@ templates = Jinja2Templates(directory="app/templates")
 app.include_router(dashboard.router, tags=["dashboard"])
 app.include_router(settings_router.router, prefix="/settings", tags=["settings"])
 app.include_router(movies.router, prefix="/movies", tags=["movies"])
+app.include_router(shows.router, prefix="/shows", tags=["shows"])
 app.include_router(logs.router, prefix="/logs", tags=["logs"])
 app.include_router(operations.router, prefix="/operations", tags=["operations"])
 app.include_router(exclusions.router, prefix="/exclusions", tags=["exclusions"])

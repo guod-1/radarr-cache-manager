@@ -13,6 +13,7 @@ from app.core.config import get_user_settings, get_settings
 from app.services.exclusions import get_exclusion_manager
 from app.core.scheduler import get_scheduler
 from app.services.radarr import get_radarr_client
+from app.services.sonarr import get_sonarr_client
 from app.services.ca_mover import get_ca_mover_monitor
 
 logger = logging.getLogger(__name__)
@@ -49,6 +50,10 @@ async def dashboard(request: Request):
         "request": request,
         "radarr_connected": radarr_connected,
         "radarr_url": user_settings.radarr.url,
+        "sonarr_connected": sonarr_connected,
+        "sonarr_url": user_settings.sonarr.url,
+        "sonarr_connected": sonarr_connected,
+        "sonarr_url": user_settings.sonarr.url,
         "scheduler_enabled": user_settings.scheduler.enabled,
         "next_run": next_run,
         "exclusion_count": exclusion_stats['total'],
