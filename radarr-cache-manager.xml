@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>radarr-cache-manager</Name>
+  <Repository>ghcr.io/yourusername/radarr-cache-manager:latest</Repository>
+  <Registry>https://ghcr.io/</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/yourusername/radarr-cache-manager/issues</Support>
+  <Project>https://github.com/yourusername/radarr-cache-manager</Project>
+  <Overview>Manage Radarr movie caching and Unraid mover exclusions based on ratings. Automatically keeps highly-rated movies on cache drive while allowing lower-rated content to move to array.</Overview>
+  <Category>MediaApp:Video MediaServer:Video Tools:</Category>
+  <WebUI>http://[IP]:[PORT:5858]</WebUI>
+  <TemplateURL/>
+  <Icon>https://raw.githubusercontent.com/yourusername/radarr-cache-manager/main/logo.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled></DateInstalled>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="Web UI Port" Target="5858" Default="5858" Mode="tcp" Description="Web interface port" Type="Port" Display="always" Required="true" Mask="false">5858</Config>
+  <Config Name="Config Directory" Target="/config" Default="/mnt/user/appdata/radarr-cache-manager" Mode="rw" Description="Application configuration and logs" Type="Path" Display="advanced" Required="true" Mask="false">/mnt/user/appdata/radarr-cache-manager</Config>
+  <Config Name="Scripts Directory" Target="/scripts" Default="/mnt/user/scripts" Mode="rw" Description="Location for mover_exclusions.txt" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/scripts</Config>
+  <Config Name="Cache Drive" Target="/mnt/chloe" Default="/mnt/chloe" Mode="rw" Description="Your cache drive path" Type="Path" Display="always" Required="true" Mask="false">/mnt/chloe</Config>
+  <Config Name="PlexCache Directory" Target="/plexcache" Default="/mnt/user/appdata/plexcache" Mode="ro" Description="PlexCache-D config directory (read-only)" Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/plexcache</Config>
+  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID" Type="Variable" Display="advanced" Required="false" Mask="false">99</Config>
+  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID" Type="Variable" Display="advanced" Required="false" Mask="false">100</Config>
+  <Config Name="TZ" Target="TZ" Default="America/New_York" Mode="" Description="Timezone" Type="Variable" Display="advanced" Required="false" Mask="false">America/New_York</Config>
+</Container>

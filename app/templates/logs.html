@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - Radarr Cache Manager{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-900">Logs</h2>
+        <a href="/logs/download" download
+            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Download Logs
+        </a>
+    </div>
+    
+    <div class="bg-gray-900 shadow rounded-lg p-4 overflow-auto" style="max-height: 600px;">
+        <pre class="text-xs text-green-400 font-mono">{% for line in log_lines %}{{ line }}{% endfor %}</pre>
+    </div>
+</div>
+{% endblock %}

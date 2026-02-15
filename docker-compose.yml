@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  radarr-cache-manager:
+    build: .
+    container_name: radarr-cache-manager
+    ports:
+      - "5858:5858"
+    volumes:
+      - ./config:/config
+      - /mnt/user/scripts:/scripts
+      - /mnt/chloe:/mnt/chloe
+      - /mnt/user/appdata/plexcache:/plexcache:ro
+    environment:
+      - TZ=America/New_York
+      - PUID=99
+      - PGID=100
+    restart: unless-stopped

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Radarr Cache Manager{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <h2 class="text-3xl font-bold text-gray-900 mb-6">Settings</h2>
+
+    <!-- Radarr Connection -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Radarr Connection</h3>
+        <form action="/settings/radarr" method="post" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">URL</label>
+                <input type="text" name="url" value="{{ settings.radarr.url }}" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <p class="mt-1 text-sm text-gray-500">Example: http://192.168.1.100:7878</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">API Key</label>
+                <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="flex justify-between">
+                <button type="submit"
+                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                    Save Connection
+                </button>
+                <button type="button" hx-post="/settings/radarr/test" hx-swap="none"
+                    class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Test Connection
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tag Operation -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Tag Operation (Optional)</h3>
+        <p class="text-sm text-gray-600 mb-4">Find movies with a specific tag and optionally replace it with another tag.</p>
+        <form action="/settings/tags" method="post" class="space-y-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Search for Tag ID</label>
+                    <select name="search_tag_id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        <option value="">-- None --</option>
+                        {% for tag in tags %}
+                        <option value="{{ tag.id }}" {% if settings.tag_operation.search_tag_id == tag.id %}selected{% endif %}>
+                            {{ tag.label }} (ID: {{ tag.id }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-1 text-sm text-gray-500">Leave empty to skip tag operations</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Replace with Tag ID (Optional)</label>
+                    <select name="replace_tag_id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        <option value="">-- Don't Replace --</option>
+                        {% for tag in tags %}
+                        <option value="{{ tag.id }}" {% if settings.tag_operation.replace_tag_id == tag.id %}selected{% endif %}>
+                            {{ tag.label }} (ID: {{ tag.id }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-1 text-sm text-gray-500">Leave empty to just find movies</p>
+                </div>
+            </div>
+            <button type="submit"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                Save Tag Settings
+            </button>
+        </form>
+    </div>
+
+    <!-- Exclusion Settings -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Exclusion Settings</h3>
+        
+        <form action="/settings/exclusions" method="post" class="space-y-6">
+            <!-- Custom Folders -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Custom Folder Exclusions</label>
+                <textarea name="custom_folders" rows="4" 
+                    class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 font-mono text-sm"
+                    placeholder="/mnt/chloe/data/media/movies/Favorites/&#10;/mnt/chloe/data/media/tv/Kids Shows/">{{ '\n'.join(settings.exclusions.custom_folders) }}</textarea>
+                <p class="mt-1 text-sm text-gray-500">One path per line. These folders will always be excluded from mover.</p>
+            </div>
+
+            <!-- Tags to Exclude -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Exclude Movies with Tags</label>
+                <select name="exclude_tag_ids" multiple size="5"
+                    class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                    {% for tag in tags %}
+                    <option value="{{ tag.id }}" {% if tag.id in settings.exclusions.exclude_tag_ids %}selected{% endif %}>
+                        {{ tag.label }} (ID: {{ tag.id }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <p class="mt-1 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple. Movies with these tags will be added to exclusions.</p>
+            </div>
+
+            <!-- PlexCache-D File -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">PlexCache-D Exclusions File Path</label>
+                <input type="text" name="plexcache_file_path" value="{{ settings.exclusions.plexcache_file_path }}"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 font-mono text-sm">
+                <p class="mt-1 text-sm text-gray-500">Path to PlexCache-D's unraid_mover_exclusions.txt file</p>
+            </div>
+
+            <button type="submit"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                Save Exclusion Settings
+            </button>
+        </form>
+    </div>
+
+    <!-- Scheduler -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Scheduler</h3>
+        <form action="/settings/scheduler" method="post" class="space-y-4">
+            <div class="flex items-center">
+                <input type="checkbox" name="enabled" value="true" {% if settings.scheduler.enabled %}checked{% endif %}
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label class="ml-2 block text-sm text-gray-900">Enable automatic runs</label>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Cron Expression</label>
+                <input type="text" name="cron_expression" value="{{ settings.scheduler.cron_expression }}" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                <p class="mt-1 text-sm text-gray-500">Example: "0 */6 * * *" = every 6 hours</p>
+            </div>
+            <button type="submit"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                Save Scheduler
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.successful) {
+            const url = event.detail.xhr.responseURL;
+            if (url.includes('/settings/radarr/test')) {
+                const response = JSON.parse(event.detail.xhr.responseText);
+                alert(response.message);
+            }
+        }
+    });
+</script>
+{% endblock %}
