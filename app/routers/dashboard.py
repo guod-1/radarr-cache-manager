@@ -18,9 +18,8 @@ async def dashboard(request: Request):
     mover_stats = mover.get_latest_stats()
     excl_stats = excl.get_exclusion_stats()
     
-    # Format mover status string
-    status_text = "No logs found"
     last_check = "N/A"
+    status_text = "No logs found"
     if mover_stats:
         status_text = f"{mover_stats['excluded']} Excluded / {mover_stats['moved']} Moved"
         last_check = datetime.datetime.fromtimestamp(mover_stats['timestamp']).strftime('%Y-%m-%d %H:%M')
