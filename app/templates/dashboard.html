@@ -65,7 +65,6 @@
             </div>
         </div>
 
-cat /tmp/sonarr_card.html
         <!-- Sonarr Connection Status -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div class="p-5">
@@ -90,6 +89,36 @@ cat /tmp/sonarr_card.html
                                 </div>
                             </dd>
                             <dd class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ sonarr_url if sonarr_url else 'Not configured' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sonarr Connection Status -->
+        <div class="bg-white dark:bg-[#282a2d] overflow-hidden shadow-lg rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if sonarr_connected %}
+                        <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {% else %}
+                        <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-400 truncate">Sonarr Status</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold {% if sonarr_connected %}text-green-500{% else %}text-gray-500{% endif %}">
+                                    {% if sonarr_connected %}Connected{% else %}Not Configured{% endif %}
+                                </div>
+                            </dd>
+                            <dd class="text-xs text-gray-500 mt-1">{{ sonarr_url if sonarr_url else 'Not configured' }}</dd>
                         </dl>
                     </div>
                 </div>
