@@ -1,15 +1,25 @@
 import logging
+from datetime import datetime
 from app.services.exclusions import get_exclusion_manager
 from app.services.radarr import get_radarr_client
 from app.services.sonarr import get_sonarr_client
-from app.core.config import get_user_settings
+from app.core.config import get_user_settings, save_user_settings
 
 logger = logging.getLogger(__name__)
+
+def _update_last_run(field: str):
+    try:
+        settings = get_user_settings()
+        setattr(settings.last_run, field, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        save_user_settings(settings)
+    except Exception as e:
+        logger.error(f"Failed to update last run time for {field}: {e}")
 
 async def run_exclusion_builder():
     try:
         manager = get_exclusion_manager()
         count = manager.combine_exclusions()
+        _update_last_run("exclusion")
         return {"status": "success", "message": f"Combined {count} exclusions"}
     except Exception as e:
         logger.error(f"Exclusion builder failed: {e}")
@@ -33,6 +43,8 @@ async def run_radarr_tag_operation():
                 movie['tags'] = new_tags
                 client.update_movie(movie)
                 affected += 1
+        
+        _update_last_run("radarr")
         return {"status": "success", "message": f"Updated {affected} movies"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -55,6 +67,8 @@ async def run_sonarr_tag_operation():
                 show['tags'] = new_tags
                 client.update_show(show)
                 affected += 1
+        
+        _update_last_run("sonarr")
         return {"status": "success", "message": f"Updated {affected} shows"}
     except Exception as e:
         return {"status": "error", "message": str(e)}

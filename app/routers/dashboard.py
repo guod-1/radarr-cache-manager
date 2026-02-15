@@ -44,8 +44,6 @@ async def dashboard(request: Request):
     # 5. Get Scheduler Stats
     scheduler = get_scheduler()
     
-    # 6. Prepare Context
-    # We unpack these directly so the template can find {{ radarr_connected }}
     context = {
         "request": request,
         "radarr_connected": radarr_connected,
@@ -56,16 +54,13 @@ async def dashboard(request: Request):
         "next_run": scheduler.get_next_run_time(),
         
         "exclusion_count": exclusion_stats.get('total_count', 0),
-        "exclusion_files": exclusion_stats.get('total_count', 0), 
-        "exclusion_dirs": 0,
-        
         "ca_mover_status": ca_stats.get('status', 'no_logs'),
-        "ca_mover_excluded": ca_stats.get('files_excluded', 0),
         
-        "tag_search_id": user_settings.radarr_tag_operation.search_tag_id,
-        "tag_replace_id": user_settings.radarr_tag_operation.replace_tag_id,
-        "custom_folder_count": len(user_settings.exclusions.custom_folders),
-        "exclude_tag_count": len(user_settings.exclusions.exclude_tag_ids),
+        # New Timestamps
+        "last_run_radarr": user_settings.last_run.radarr,
+        "last_run_sonarr": user_settings.last_run.sonarr,
+        "last_run_exclusion": user_settings.last_run.exclusion,
+        "last_run_mover": user_settings.last_run.mover_check,
     }
 
     return templates.TemplateResponse("dashboard.html", context)

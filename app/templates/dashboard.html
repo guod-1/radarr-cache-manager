@@ -37,6 +37,7 @@
                                 <div class="text-lg font-medium text-gray-900 dark:text-white">
                                     {% if radarr_connected %}Connected{% else %}Disconnected{% endif %}
                                 </div>
+                                <p class="text-xs text-gray-500 mt-1">Last Sync: {{ last_run_radarr }}</p>
                             </dd>
                         </dl>
                     </div>
@@ -69,6 +70,7 @@
                                 <div class="text-lg font-medium text-gray-900 dark:text-white">
                                     {% if sonarr_connected %}Connected{% else %}Disconnected{% endif %}
                                 </div>
+                                <p class="text-xs text-gray-500 mt-1">Last Sync: {{ last_run_sonarr }}</p>
                             </dd>
                         </dl>
                     </div>
@@ -93,6 +95,7 @@
                                 <span id="dashboard-exclusion-count" class="text-3xl font-bold text-gray-900 dark:text-white">
                                     {{ exclusion_count }}
                                 </span>
+                                <p class="text-xs text-gray-500 mt-1">Last Build: {{ last_run_exclusion }}</p>
                             </dd>
                         </dl>
                     </div>
@@ -115,6 +118,7 @@
                             <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Last Mover Check</dt>
                             <dd>
                                 <div class="text-lg font-medium text-gray-900 dark:text-white">{{ ca_mover_status }}</div>
+                                <p class="text-xs text-gray-500 mt-1">{{ last_run_mover }}</p>
                             </dd>
                         </dl>
                     </div>
