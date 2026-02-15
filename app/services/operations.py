@@ -7,24 +7,20 @@ from app.core.config import get_user_settings
 logger = logging.getLogger(__name__)
 
 async def run_exclusion_builder():
-    """Builds and combines exclusion files - Matches router expectation"""
     try:
         manager = get_exclusion_manager()
         count = manager.combine_exclusions()
-        logger.info(f"Successfully combined {count} exclusions")
         return {"status": "success", "message": f"Combined {count} exclusions"}
     except Exception as e:
         logger.error(f"Exclusion builder failed: {e}")
         return {"status": "error", "message": str(e)}
 
 async def run_radarr_tag_operation():
-    """Finds movies with search_tag, removes it, and adds replace_tag"""
     try:
         settings = get_user_settings()
         ops = settings.radarr_tag_operation
         if not ops or ops.search_tag_id is None or ops.replace_tag_id is None:
             return {"status": "skipped", "message": "Radarr tags not configured"}
-
         client = get_radarr_client()
         movies = client.get_all_movies()
         affected = 0
@@ -42,13 +38,11 @@ async def run_radarr_tag_operation():
         return {"status": "error", "message": str(e)}
 
 async def run_sonarr_tag_operation():
-    """Finds shows with search_tag, removes it, and adds replace_tag"""
     try:
         settings = get_user_settings()
         ops = settings.sonarr_tag_operation
         if not ops or ops.search_tag_id is None or ops.replace_tag_id is None:
             return {"status": "skipped", "message": "Sonarr tags not configured"}
-
         client = get_sonarr_client()
         shows = client.get_all_shows()
         affected = 0
@@ -66,7 +60,6 @@ async def run_sonarr_tag_operation():
         return {"status": "error", "message": str(e)}
 
 async def run_full_sync():
-    """Runs all operations in sequence"""
     try:
         await run_radarr_tag_operation()
         await run_sonarr_tag_operation()
