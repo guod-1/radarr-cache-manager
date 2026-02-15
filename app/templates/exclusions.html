@@ -4,150 +4,294 @@
 
 {% block content %}
 <div class="px-4 py-6 sm:px-0">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-900">Mover Exclusions</h2>
-        <a href="/exclusions/download" download
-            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-            </svg>
-            Download File
-        </a>
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Exclusions Manager</h2>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <nav class="-mb-px flex space-x-8">
+            <button onclick="showTab('settings')" id="tab-settings" 
+                class="tab-button border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600 dark:text-blue-400">
+                Settings
+            </button>
+            <button onclick="showTab('viewer')" id="tab-viewer"
+                class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600">
+                File Viewer
+            </button>
+        </nav>
     </div>
 
-    <!-- File Info -->
-    <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                </svg>
-            </div>
-            <div class="ml-3 flex-1">
-                <h3 class="text-sm font-medium text-blue-800">File Location</h3>
-                <div class="mt-2 text-sm text-blue-700">
-                    <p class="font-mono text-xs bg-white px-2 py-1 rounded border border-blue-200 inline-block">
-                        {{ output_path }}
-                    </p>
+    <!-- Settings Tab -->
+    <div id="content-settings" class="tab-content">
+        <!-- Output File Info -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400 dark:text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Exclusions</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ total }}</dd>
-                        </dl>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Exclusions Output File</h3>
+                    <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+                        <p class="font-mono text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded border border-blue-200 dark:border-blue-700 inline-block">
+                            /config/mover_exclusions.txt
+                        </p>
+                        <p class="mt-2 text-xs">Copy this file to <code class="bg-white dark:bg-gray-800 px-1 rounded">/mnt/user/scripts/mover_exclusions.txt</code> for Unraid mover to use it.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Directories</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ directories }}</dd>
-                        </dl>
-                    </div>
-                </div>
+        <form action="/settings/exclusions" method="post" class="space-y-6">
+            <!-- Custom Folders -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Custom Folder Exclusions</label>
+                <textarea name="custom_folders" rows="6" 
+                    class="block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 font-mono text-sm text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="/mnt/chloe/data/media/movies/Favorites/&#10;/mnt/chloe/data/media/tv/Kids Shows/">{{ '\n'.join(settings.exclusions.custom_folders) }}</textarea>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">One path per line. These folders will always be excluded from mover.</p>
             </div>
-        </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Files</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ files }}</dd>
-                        </dl>
-                    </div>
+            <!-- Tags to Exclude -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Exclude Movies with Tags</label>
+                
+                <div class="flex gap-2 mb-3">
+                    <select id="tag-selector" class="flex-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
+                        <option value="">-- Select a tag to add --</option>
+                        {% for tag in tags %}
+                        <option value="{{ tag.id }}" data-label="{{ tag.label }}">
+                            {{ tag.label }} (ID: {{ tag.id }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" onclick="addTag()" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
+                        Add Tag
+                    </button>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Search Box -->
-    <div class="mb-4">
-        <input type="text" id="searchBox" placeholder="Search exclusions..." 
-            class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            onkeyup="filterExclusions()">
-    </div>
-
-    <!-- Exclusions List -->
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        <div class="max-h-96 overflow-y-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50 sticky top-0">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Path</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200" id="exclusionsList">
-                    {% for exclusion in exclusions %}
-                    <tr class="exclusion-row">
-                        <td class="px-6 py-4 text-sm font-mono text-gray-900 exclusion-path">{{ exclusion }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {% if '.' in exclusion.split('/')[-1] %}
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                File
-                            </span>
-                            {% else %}
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Directory
-                            </span>
-                            {% endif %}
-                        </td>
-                    </tr>
+                <div id="selected-tags" class="space-y-2 mb-3">
+                    {% for tag_id in settings.exclusions.exclude_tag_ids %}
+                    {% set tag_info = tags|selectattr('id', 'equalto', tag_id)|first %}
+                    <div class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md tag-item" data-tag-id="{{ tag_id }}">
+                        <span class="text-sm text-gray-900 dark:text-gray-100">
+                            <strong>{{ tag_info.label if tag_info else 'Unknown' }}</strong> (ID: {{ tag_id }})
+                        </span>
+                        <button type="button" onclick="removeTag({{ tag_id }})" 
+                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium">
+                            Remove
+                        </button>
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                </div>
+
+                <input type="hidden" name="exclude_tag_ids" id="exclude-tag-ids" value="{{ ','.join(settings.exclusions.exclude_tag_ids|map('string')) }}">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Movies with these tags will be added to exclusions.</p>
+            </div>
+
+            <!-- PlexCache-D File -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">PlexCache-D Exclusions File Path</label>
+                <input type="text" name="plexcache_file_path" value="{{ settings.exclusions.plexcache_file_path }}"
+                    class="block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 font-mono text-sm text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500">
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Path to PlexCache-D's unraid_mover_exclusions.txt file</p>
+            </div>
+
+            <button type="submit"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
+                Save Exclusion Settings
+            </button>
+        </form>
     </div>
 
-    {% if not exclusions %}
-    <div class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No exclusions</h3>
-        <p class="mt-1 text-sm text-gray-500">Run the exclusion builder to generate the file.</p>
-        <div class="mt-6">
-            <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                Go to Dashboard
+    <!-- Viewer Tab -->
+    <div id="content-viewer" class="tab-content hidden">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Exclusions</dt>
+                                <dd class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ total }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Directories</dt>
+                                <dd class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ directories }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 2 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Files</dt>
+                                <dd class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ files }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Download -->
+        <div class="flex justify-between items-center mb-4">
+            <input type="text" id="searchBox" placeholder="Search exclusions..." 
+                class="flex-1 mr-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
+                onkeyup="filterExclusions()">
+            <a href="/exclusions/download" download
+                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download
             </a>
         </div>
+
+        <!-- Exclusions Table -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+            <div class="max-h-96 overflow-y-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900 sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Path</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="exclusionsList">
+                        {% for exclusion in exclusions %}
+                        <tr class="exclusion-row">
+                            <td class="px-6 py-4 text-sm font-mono text-gray-900 dark:text-gray-100 exclusion-path break-all">{{ exclusion }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {% if '.' in exclusion.split('/')[-1] %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300">
+                                    File
+                                </span>
+                                {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
+                                    Directory
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if not exclusions %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No exclusions</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Run the exclusion builder to generate the file.</p>
+            <div class="mt-6">
+                <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
 <script>
+function showTab(tabName) {
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    
+    // Remove active state from all tabs
+    document.querySelectorAll('.tab-button').forEach(el => {
+        el.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
+        el.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+    });
+    
+    // Show selected tab content
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+    
+    // Add active state to selected tab
+    const activeTab = document.getElementById('tab-' + tabName);
+    activeTab.classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
+    activeTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+}
+
+function addTag() {
+    const selector = document.getElementById('tag-selector');
+    const tagId = selector.value;
+    const tagLabel = selector.options[selector.selectedIndex].dataset.label;
+    
+    if (!tagId) return;
+    
+    if (document.querySelector(`.tag-item[data-tag-id="${tagId}"]`)) {
+        alert('This tag is already added');
+        return;
+    }
+    
+    const tagsList = document.getElementById('selected-tags');
+    const tagItem = document.createElement('div');
+    tagItem.className = 'flex items-center justify-between bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md tag-item';
+    tagItem.dataset.tagId = tagId;
+    tagItem.innerHTML = `
+        <span class="text-sm text-gray-900 dark:text-gray-100">
+            <strong>${tagLabel}</strong> (ID: ${tagId})
+        </span>
+        <button type="button" onclick="removeTag(${tagId})" 
+            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium">
+            Remove
+        </button>
+    `;
+    tagsList.appendChild(tagItem);
+    
+    updateHiddenInput();
+    selector.value = '';
+}
+
+function removeTag(tagId) {
+    const tagItem = document.querySelector(`.tag-item[data-tag-id="${tagId}"]`);
+    if (tagItem) {
+        tagItem.remove();
+        updateHiddenInput();
+    }
+}
+
+function updateHiddenInput() {
+    const tagItems = document.querySelectorAll('.tag-item');
+    const tagIds = Array.from(tagItems).map(item => item.dataset.tagId);
+    document.getElementById('exclude-tag-ids').value = tagIds.join(',');
+}
+
 function filterExclusions() {
     const searchBox = document.getElementById('searchBox');
     const filter = searchBox.value.toLowerCase();

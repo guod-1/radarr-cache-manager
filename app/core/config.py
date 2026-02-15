@@ -46,7 +46,7 @@ class AppSettings(BaseSettings):
     @property
     def exclusions_file(self) -> Path:
         """Path to mover exclusions file"""
-        return self.scripts_dir / "mover_exclusions.txt"
+        return self.config_dir / "mover_exclusions.txt"
     
     @property
     def folder_exclusions_file(self) -> Path:

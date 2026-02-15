@@ -6,24 +6,24 @@
 <div class="px-4 py-6 sm:px-0">
     <!-- Header with Operation Buttons -->
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-900">Dashboard</h2>
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h2>
         <div class="flex space-x-2">
             <button 
                 hx-post="/operations/run/tags" 
                 hx-swap="none"
-                class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                 Run Tags
             </button>
             <button 
                 hx-post="/operations/run/exclusions" 
                 hx-swap="none"
-                class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                 Build Exclusions
             </button>
             <button 
                 hx-post="/operations/run/full" 
                 hx-swap="none"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
                 <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -36,29 +36,29 @@
     <!-- Status Cards -->
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
         <!-- Radarr Connection Status -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         {% if radarr_connected %}
-                        <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-6 w-6 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         {% else %}
-                        <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-6 w-6 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         {% endif %}
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Radarr Status</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Radarr Status</dt>
                             <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold {% if radarr_connected %}text-green-600{% else %}text-red-600{% endif %}">
+                                <div class="text-2xl font-semibold {% if radarr_connected %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
                                     {% if radarr_connected %}Connected{% else %}Disconnected{% endif %}
                                 </div>
                             </dd>
-                            <dd class="text-xs text-gray-500 mt-1">{{ radarr_url }}</dd>
+                            <dd class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ radarr_url }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -66,23 +66,23 @@
         </div>
 
         <!-- Scheduler Status -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-6 w-6 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Scheduler</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Scheduler</dt>
                             <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900">
+                                <div class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                                     {% if scheduler_enabled %}Enabled{% else %}Disabled{% endif %}
                                 </div>
                             </dd>
-                            <dd class="text-xs text-gray-500 mt-1">Next: {{ next_run }}</dd>
+                            <dd class="text-xs text-gray-500 dark:text-gray-400 mt-1">Next: {{ next_run }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -90,23 +90,23 @@
         </div>
 
         <!-- Exclusions Count -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-6 w-6 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Exclusions</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Exclusions</dt>
                             <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900">
+                                <div class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                                     {{ exclusion_count }}
                                 </div>
                             </dd>
-                            <dd class="text-xs text-gray-500 mt-1">{{ exclusion_files }} files, {{ exclusion_dirs }} directories</dd>
+                            <dd class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ exclusion_files }} files, {{ exclusion_dirs }} directories</dd>
                         </dl>
                     </div>
                 </div>
@@ -117,34 +117,34 @@
     <!-- Operations Info -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-6">
         <!-- Tag Operations -->
-        <div class="bg-white shadow rounded-lg p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-3">Tag Operations</h3>
-            <p class="text-sm text-gray-600 mb-3">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Tag Operations</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
                 Find movies with specific tags and optionally replace them with another tag.
             </p>
             {% if tag_search_id %}
-            <div class="bg-blue-50 p-3 rounded">
-                <p class="text-sm"><strong>Searching for:</strong> Tag ID {{ tag_search_id }}</p>
+            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
+                <p class="text-sm text-gray-900 dark:text-gray-100"><strong>Searching for:</strong> Tag ID {{ tag_search_id }}</p>
                 {% if tag_replace_id %}
-                <p class="text-sm"><strong>Replacing with:</strong> Tag ID {{ tag_replace_id }}</p>
+                <p class="text-sm text-gray-900 dark:text-gray-100"><strong>Replacing with:</strong> Tag ID {{ tag_replace_id }}</p>
                 {% else %}
-                <p class="text-sm text-gray-500">No replacement configured</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">No replacement configured</p>
                 {% endif %}
             </div>
             {% else %}
-            <div class="bg-gray-50 p-3 rounded">
-                <p class="text-sm text-gray-600">Not configured. Go to Settings to set up tag operations.</p>
+            <div class="bg-gray-50 dark:bg-gray-900/20 p-3 rounded">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Not configured. Go to Settings to set up tag operations.</p>
             </div>
             {% endif %}
         </div>
 
         <!-- Exclusion Builder -->
-        <div class="bg-white shadow rounded-lg p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-3">Exclusion Builder</h3>
-            <p class="text-sm text-gray-600 mb-3">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Exclusion Builder</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
                 Combines exclusions from multiple sources into mover_exclusions.txt
             </p>
-            <ul class="text-sm space-y-1 text-gray-600">
+            <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
                 <li>✓ Custom folders ({{ custom_folder_count }})</li>
                 <li>✓ Movies with tags ({{ exclude_tag_count }} tags)</li>
                 <li>✓ PlexCache-D exclusions</li>
@@ -153,26 +153,26 @@
     </div>
 
     <!-- Quick Links -->
-    <div class="bg-white shadow rounded-lg p-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Links</h3>
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <a href="/settings" class="block px-4 py-2 text-sm text-center text-gray-700 bg-gray-100 hover:bg-gray-200 rounded">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Quick Links</h3>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-4">
+            <a href="/exclusions" class="block px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded">
+                Manage Exclusions
+            </a>
+            <a href="/settings" class="block px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded">
                 Configure Settings
             </a>
-            <a href="/movies" class="block px-4 py-2 text-sm text-center text-gray-700 bg-gray-100 hover:bg-gray-200 rounded">
+            <a href="/movies" class="block px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded">
                 View Movies
             </a>
-            <a href="/logs" class="block px-4 py-2 text-sm text-center text-gray-700 bg-gray-100 hover:bg-gray-200 rounded">
+            <a href="/logs" class="block px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded">
                 View Logs
             </a>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-    // Show success message when operation completes
     document.body.addEventListener('htmx:afterRequest', function(event) {
         if (event.detail.successful && event.detail.xhr.responseURL.includes('/operations/run')) {
             const response = JSON.parse(event.detail.xhr.responseText);
