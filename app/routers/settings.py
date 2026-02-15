@@ -152,3 +152,42 @@ async def update_scheduler(
     scheduler.update_schedule()
     
     return RedirectResponse(url="/settings?success=scheduler", status_code=303)
+
+
+@router.post("/sonarr")
+async def update_sonarr_settings(
+    url: str = Form(...),
+    api_key: str = Form(...)
+):
+    """Update Sonarr settings"""
+    from app.core.config import SonarrSettings
+    
+    user_settings = get_user_settings()
+    
+    user_settings.sonarr = SonarrSettings(
+        url=url,
+        api_key=api_key
+    )
+    
+    save_user_settings(user_settings)
+    logger.info("Sonarr settings updated")
+    
+    return RedirectResponse(url="/settings?success=sonarr", status_code=303)
+
+
+@router.post("/sonarr/test")
+async def test_sonarr_connection():
+    """Test Sonarr connection"""
+    from app.services.sonarr import get_sonarr_client
+    
+    sonarr_client = get_sonarr_client()
+    
+    try:
+        connected = sonarr_client.test_connection()
+        if connected:
+            return {"success": True, "message": "Connected to Sonarr successfully!"}
+        else:
+            return {"success": False, "message": "Failed to connect to Sonarr. Check URL and API key."}
+    except Exception as e:
+        logger.error(f"Sonarr connection test failed: {e}")
+        return {"success": False, "message": str(e)}
