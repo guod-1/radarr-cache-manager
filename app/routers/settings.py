@@ -12,7 +12,7 @@ import logging
 
 from app.core.config import (
     get_user_settings, save_user_settings, UserSettings, 
-    RadarrSettings, RadarrTagOperation, ExclusionSettings, SchedulerSettings
+    RadarrSettings, RadarrRadarrTagOperation, ExclusionSettings, SchedulerSettings
 )
 from app.services.radarr import get_radarr_client
 from app.core.scheduler import get_scheduler
@@ -93,7 +93,7 @@ async def update_tag_settings(
     search_id = int(search_tag_id) if search_tag_id and search_tag_id != "" else None
     replace_id = int(replace_tag_id) if replace_tag_id and replace_tag_id != "" else None
     
-    user_settings.tag_operation = RadarrTagOperation(
+    user_settings.tag_operation = RadarrRadarrTagOperation(
         search_tag_id=search_id,
         replace_tag_id=replace_id
     )
@@ -199,11 +199,11 @@ async def update_radarr_tag_settings(
     radarr_replace_tag_id: Optional[int] = Form(None)
 ):
     """Update Radarr tag operation settings"""
-    from app.core.config import RadarrRadarrTagOperation
+    from app.core.config import RadarrRadarrRadarrTagOperation
     
     user_settings = get_user_settings()
     
-    user_settings.radarr_tag_operation = RadarrRadarrTagOperation(
+    user_settings.radarr_tag_operation = RadarrRadarrRadarrTagOperation(
         search_tag_id=radarr_search_tag_id,
         replace_tag_id=radarr_replace_tag_id
     )
@@ -220,11 +220,11 @@ async def update_sonarr_tag_settings(
     sonarr_replace_tag_id: Optional[int] = Form(None)
 ):
     """Update Sonarr tag operation settings"""
-    from app.core.config import SonarrRadarrTagOperation
+    from app.core.config import SonarrRadarrRadarrTagOperation
     
     user_settings = get_user_settings()
     
-    user_settings.sonarr_tag_operation = SonarrRadarrTagOperation(
+    user_settings.sonarr_tag_operation = SonarrRadarrRadarrTagOperation(
         search_tag_id=sonarr_search_tag_id,
         replace_tag_id=sonarr_replace_tag_id
     )
