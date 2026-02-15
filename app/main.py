@@ -9,19 +9,21 @@ from app.core.config import get_user_settings
 from app.core.scheduler import get_scheduler
 from app.routers import dashboard, settings, movies, shows, logs, operations, exclusions
 
-# Setup logging
+# Initialize Logging to File
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("/config/app.log"),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Mover Tuning Exclusion Manager")
-
-# Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Include routers
+# Include all routers
 app.include_router(dashboard.router, tags=["Dashboard"])
 app.include_router(exclusions.router, prefix="/exclusions", tags=["Exclusions"])
 app.include_router(movies.router, prefix="/movies", tags=["Movies"])
@@ -32,20 +34,13 @@ app.include_router(operations.router, prefix="/operations", tags=["Operations"])
 
 @app.on_event("startup")
 async def startup_event():
-    user_settings = get_user_settings()
     logger.info("Starting Mover Tuning Exclusion Manager...")
-    logger.info(f"Config directory: /config")
-    
-    # Start the scheduler
-    scheduler = get_scheduler()
-    scheduler.start()
-    logger.info("Scheduler started")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    scheduler = get_scheduler()
-    scheduler.shutdown()
-    logger.info("Shutting down...")
+    try:
+        scheduler = get_scheduler()
+        scheduler.start()
+        logger.info("Scheduler service initialized.")
+    except Exception as e:
+        logger.error(f"Scheduler failed to start: {e}")
 
 @app.get("/health")
 async def health_check():
@@ -54,4 +49,3 @@ async def health_check():
 @app.exception_handler(404)
 async def custom_404_handler(request: Request, exc):
     return RedirectResponse(url="/")
-
