@@ -1,11 +1,9 @@
 name: Build and Push Docker Image
 
-cat > .github/workflows/docker-build.yml << 'EOF'
-name: Build and Push Docker Image
-
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
   workflow_dispatch:
 
 env:
