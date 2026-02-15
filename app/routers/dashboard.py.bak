@@ -13,7 +13,6 @@ from app.core.config import get_user_settings, get_settings
 from app.services.exclusions import get_exclusion_manager
 from app.core.scheduler import get_scheduler
 from app.services.radarr import get_radarr_client
-from app.services.ca_mover import get_ca_mover_monitor
 
 logger = logging.getLogger(__name__)
 
@@ -41,10 +40,6 @@ async def dashboard(request: Request):
     # Get scheduler info
     next_run = scheduler.get_next_run_time() if user_settings.scheduler.enabled else "Disabled"
     
-    # Get CA Mover status
-    ca_monitor = get_ca_mover_monitor()
-    ca_status = ca_monitor.parse_log()
-
     context = {
         "request": request,
         "radarr_connected": radarr_connected,
@@ -58,9 +53,6 @@ async def dashboard(request: Request):
         "tag_replace_id": user_settings.tag_operation.replace_tag_id,
         "custom_folder_count": len(user_settings.exclusions.custom_folders),
         "exclude_tag_count": len(user_settings.exclusions.exclude_tag_ids),
-        "ca_mover_status": ca_status["status"],
-        "ca_mover_excluded": ca_status["files_excluded"],
-        "ca_mover_last_run": ca_status["last_run"],
     }
     
     return templates.TemplateResponse("dashboard.html", context)
