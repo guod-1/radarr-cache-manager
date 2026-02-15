@@ -6,59 +6,58 @@
 
     <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden">
         <div class="px-4 py-5 sm:px-6 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Exclude Movies with Tags</h3>
+            <h3 class="text-lg font-medium">Exclude via Tags</h3>
         </div>
         <div class="p-6 space-y-6">
             <form action="/exclusions/tags/add" method="POST" class="flex items-end space-x-4">
                 <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Tag to Exclude</label>
+                    <label class="block text-sm font-medium">Select Tag</label>
                     <select name="tag_id" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
-                        <option value="">-- Select a tag to add --</option>
+                        <option value="">-- Select a tag --</option>
+                        <optgroup label="Radarr Tags">
                         {% for tag in radarr_tags %}
-                        <option value="{{ tag.id }}">{{ tag.label }} (Radarr)</option>
+                            <option value="{{ tag.id }}">{{ tag.label }}</option>
                         {% endfor %}
+                        </optgroup>
+                        <optgroup label="Sonarr Tags">
                         {% for tag in sonarr_tags %}
-                        <option value="{{ tag.id }}">{{ tag.label }} (Sonarr)</option>
+                            <option value="{{ tag.id }}">{{ tag.label }}</option>
                         {% endfor %}
+                        </optgroup>
                     </select>
                 </div>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Add Tag</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Add Tag</button>
             </form>
 
             <div class="mt-4">
-                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Currently Excluded Tag IDs:</h4>
+                <h4 class="text-sm font-semibold mb-2">Active Excluded Tags:</h4>
                 <div class="flex flex-wrap gap-2">
                     {% for tag_id in user_settings.exclusions.exclude_tag_ids %}
                     <form action="/exclusions/tags/remove" method="POST" class="inline">
                         <input type="hidden" name="tag_id" value="{{ tag_id }}">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                            ID: {{ tag_id }}
-                            <button type="submit" class="ml-2 focus:outline-none">&times;</button>
+                            Tag ID: {{ tag_id }}
+                            <button type="submit" class="ml-2 font-bold">&times;</button>
                         </span>
                     </form>
                     {% endfor %}
                 </div>
-                {% if not user_settings.exclusions.exclude_tag_ids %}
-                <p class="text-sm text-gray-500 italic">No tags selected yet.</p>
-                {% endif %}
             </div>
         </div>
     </div>
-
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden">
-        <div class="px-4 py-5 sm:px-6 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Folder & PlexCache Settings</h3>
-        </div>
-        <form action="/exclusions/save" method="POST" class="p-6 space-y-4">
+    
+    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-6">
+        <h3 class="text-lg font-medium mb-4">Manual Paths & PlexCache</h3>
+        <form action="/exclusions/save" method="POST" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Custom Folders to Exclude (One per line)</label>
-                <textarea name="custom_folders" rows="4" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100 font-mono">{{ user_settings.exclusions.custom_folders | join('\n') }}</textarea>
+                <label class="block text-sm font-medium">PlexCache File Path</label>
+                <input type="text" name="plexcache_file_path" value="{{ user_settings.exclusions.plexcache_file_path }}" class="mt-1 block w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 text-gray-900 dark:text-gray-100">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">PlexCache File Path</label>
-                <input type="text" name="plexcache_file_path" value="{{ user_settings.exclusions.plexcache_file_path }}" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100 font-mono">
+                <label class="block text-sm font-medium">Additional Custom Folders (one per line)</label>
+                <textarea name="custom_folders" rows="3" class="mt-1 block w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 text-gray-900 dark:text-gray-100">{{ user_settings.exclusions.custom_folders | join('\n') }}</textarea>
             </div>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save Paths</button>
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Save Path Settings</button>
         </form>
     </div>
 </div>
