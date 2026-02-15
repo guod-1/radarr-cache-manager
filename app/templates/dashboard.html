@@ -34,7 +34,7 @@
     </div>
 
     <!-- Status Cards -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <!-- Radarr Connection Status -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div class="p-5">
@@ -107,6 +107,42 @@
                                 </div>
                             </dd>
                             <dd class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ exclusion_files }} files, {{ exclusion_dirs }} directories</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CA Mover Tuning Status -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if ca_mover_status == 'working' %}
+                        <svg class="h-6 w-6 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {% elif ca_mover_status == 'configured' %}
+                        <svg class="h-6 w-6 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {% else %}
+                        <svg class="h-6 w-6 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">CA Mover Tuning</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold {% if ca_mover_status == 'working' %}text-green-600 dark:text-green-400{% elif ca_mover_status == 'configured' %}text-blue-600 dark:text-blue-400{% else %}text-orange-600 dark:text-orange-400{% endif %}">
+                                    {{ ca_mover_excluded }}
+                                </div>
+                            </dd>
+                            <dd class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {% if ca_mover_status == 'working' %}Files excluded{% elif ca_mover_status == 'configured' %}Configured{% else %}No logs{% endif %}
+                            </dd>
                         </dl>
                     </div>
                 </div>
