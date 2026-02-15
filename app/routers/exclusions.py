@@ -122,3 +122,19 @@ async def download_exclusions():
         )
     else:
         return {"error": "Exclusions file not found"}
+
+
+@router.post("/settings/save")
+async def save_settings(
+    custom_folders: str = Form(""),
+    exclude_tag_ids: str = Form(""),
+    plexcache_file_path: str = Form("/plexcache/unraid_mover_exclusions.txt"),
+    ca_mover_log_path: str = Form("/config/ca.mover.tuning")
+):
+    """Alternative save endpoint"""
+    return await save_exclusion_settings(
+        custom_folders=custom_folders,
+        exclude_tag_ids=exclude_tag_ids,
+        plexcache_file_path=plexcache_file_path,
+        ca_mover_log_path=ca_mover_log_path
+    )
