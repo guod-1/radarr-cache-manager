@@ -115,6 +115,12 @@
                     class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Example: "0 */6 * * *" = every 6 hours</p>
             </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">CA Mover Log Check Schedule</label>
+                <input type="text" name="ca_mover_check_cron" value="{{ settings.scheduler.ca_mover_check_cron }}" required
+                    class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Example: "30 23 * * *" = daily at 11:30 PM</p>
+            </div>
             <button type="submit"
                 class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
                 Save Scheduler

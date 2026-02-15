@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,13 @@
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
+        /* Plex-inspired colors */
+        :root {
+            --plex-bg: #1f1f1f;
+            --plex-card: #282a2d;
+            --plex-accent: #E5A00D;
+            --plex-accent-hover: #cc7b19;
+        }
     </style>
     
     <script>
@@ -24,45 +31,56 @@
             localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
         }
         
-        // Load dark mode preference on page load
-        if (localStorage.getItem('darkMode') === 'true' || 
-            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        // Load dark mode preference (default to dark)
+        if (localStorage.getItem('darkMode') !== 'false') {
             document.documentElement.classList.add('dark');
         }
     </script>
     
     <script>
         tailwind.config = {
-            darkMode: 'class'
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'plex': {
+                            'bg': '#1f1f1f',
+                            'card': '#282a2d',
+                            'accent': '#E5A00D',
+                            'accent-hover': '#cc7b19'
+                        }
+                    }
+                }
+            }
         }
     </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+<body class="bg-gray-50 dark:bg-[#1f1f1f] transition-colors duration-200">
     <!-- Navigation -->
-    <nav class="bg-white dark:bg-gray-800 shadow-lg transition-colors duration-200">
+    <nav class="bg-white dark:bg-[#282a2d] shadow-lg border-b border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Mover Tuning Exclusion Manager</h1>
+                        <h1 class="text-xl font-bold text-gray-800 dark:text-white">Mover Tuning Exclusion Manager</h1>
                     </div>
-                    <div class="hidden md:ml-6 md:flex md:space-x-8">
-                        <a href="/" class="inline-flex items-center px-1 pt-1 border-b-2 {% if request.url.path == '/' %}border-blue-500 text-gray-900 dark:text-gray-100{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300{% endif %} text-sm font-medium">
+                    <div class="hidden md:ml-8 md:flex md:space-x-6">
+                        <a href="/" class="inline-flex items-center px-1 pt-1 border-b-2 {% if request.url.path == '/' %}border-[#E5A00D] text-white{% else %}border-transparent text-gray-400 hover:text-gray-200{% endif %} text-sm font-medium transition-colors">
                             Dashboard
                         </a>
-                        <a href="/exclusions" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/exclusions' in request.url.path %}border-blue-500 text-gray-900 dark:text-gray-100{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300{% endif %} text-sm font-medium">
+                        <a href="/exclusions" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/exclusions' in request.url.path %}border-[#E5A00D] text-white{% else %}border-transparent text-gray-400 hover:text-gray-200{% endif %} text-sm font-medium transition-colors">
                             Exclusions
                         </a>
-                        <a href="/movies" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/movies' in request.url.path %}border-blue-500 text-gray-900 dark:text-gray-100{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300{% endif %} text-sm font-medium">
-                        <a href="/shows" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/shows' in request.url.path %}border-blue-500 text-gray-900 dark:text-gray-100{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300{% endif %} text-sm font-medium">
-                            TV Shows
-                        </a>
+                        <a href="/movies" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/movies' in request.url.path %}border-[#E5A00D] text-white{% else %}border-transparent text-gray-400 hover:text-gray-200{% endif %} text-sm font-medium transition-colors">
                             Movies
                         </a>
-                        <a href="/settings" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/settings' in request.url.path %}border-blue-500 text-gray-900 dark:text-gray-100{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300{% endif %} text-sm font-medium">
+                        <a href="/shows" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/shows' in request.url.path %}border-[#E5A00D] text-white{% else %}border-transparent text-gray-400 hover:text-gray-200{% endif %} text-sm font-medium transition-colors">
+                            TV Shows
+                        </a>
+                        <a href="/settings" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/settings' in request.url.path %}border-[#E5A00D] text-white{% else %}border-transparent text-gray-400 hover:text-gray-200{% endif %} text-sm font-medium transition-colors">
                             Settings
                         </a>
-                        <a href="/logs" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/logs' in request.url.path %}border-blue-500 text-gray-900 dark:text-gray-100{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300{% endif %} text-sm font-medium">
+                        <a href="/logs" class="inline-flex items-center px-1 pt-1 border-b-2 {% if '/logs' in request.url.path %}border-[#E5A00D] text-white{% else %}border-transparent text-gray-400 hover:text-gray-200{% endif %} text-sm font-medium transition-colors">
                             Logs
                         </a>
                     </div>
@@ -70,7 +88,7 @@
                 
                 <!-- Dark Mode Toggle -->
                 <div class="flex items-center">
-                    <button onclick="toggleDarkMode()" class="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none">
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-md text-gray-400 hover:text-[#E5A00D] focus:outline-none transition-colors">
                         <svg class="h-6 w-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
@@ -89,10 +107,10 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-800 mt-8 transition-colors duration-200">
+    <footer class="bg-white dark:bg-[#282a2d] mt-8 border-t border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
             <p class="text-center text-sm text-gray-500 dark:text-gray-400">
-                Mover Tuning Exclusion Manager v1.0.0
+                Mover Tuning Exclusion Manager v1.1.2
             </p>
         </div>
     </footer>
