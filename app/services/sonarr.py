@@ -14,51 +14,39 @@ class SonarrClient:
         return {'X-Api-Key': self.api_key}
 
     def test_connection(self):
-        if not self.url or not self.api_key:
-            return False
+        if not self.url or not self.api_key: return False
         try:
-            response = requests.get(f"{self.url}/api/v3/system/status", headers=self._get_headers(), timeout=5)
-            return response.status_code == 200
-        except Exception as e:
-            logger.error(f"Sonarr connection test failed: {e}")
-            return False
+            return requests.get(f"{self.url}/api/v3/system/status", headers=self._get_headers(), timeout=5).status_code == 200
+        except: return False
 
     def get_all_shows(self):
-        """Fetch all shows with their tags"""
-        if not self.url or not self.api_key:
-            return []
+        if not self.url or not self.api_key: return []
         try:
-            response = requests.get(f"{self.url}/api/v3/series", headers=self._get_headers(), timeout=30)
+            response = requests.get(f"{self.url}/api/v3/series", headers=self._get_headers(), timeout=60)
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            logger.error(f"Failed to fetch shows from Sonarr: {e}")
+            logger.error(f"Failed to fetch shows: {e}")
             return []
 
     def get_episode_files(self, series_id):
-        """Fetch all existing episode files for a specific series"""
-        if not self.url or not self.api_key:
-            return []
+        """Returns actual files on disk for a series"""
+        if not self.url or not self.api_key: return []
         try:
-            # This endpoint returns only files that actually exist on disk
-            response = requests.get(f"{self.url}/api/v3/episodefile?seriesId={series_id}", headers=self._get_headers(), timeout=30)
+            response = requests.get(f"{self.url}/api/v3/episodefile?seriesId={series_id}", headers=self._get_headers(), timeout=60)
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            logger.error(f"Failed to fetch episode files for series {series_id}: {e}")
+            logger.error(f"Failed to fetch episodes for series {series_id}: {e}")
             return []
 
     def get_all_tags(self):
-        """Fetch all tags"""
-        if not self.url or not self.api_key:
-            return []
+        if not self.url or not self.api_key: return []
         try:
             response = requests.get(f"{self.url}/api/v3/tag", headers=self._get_headers(), timeout=10)
             response.raise_for_status()
             return response.json()
-        except Exception as e:
-            logger.error(f"Failed to fetch tags from Sonarr: {e}")
-            return []
+        except: return []
 
 def get_sonarr_client():
     return SonarrClient()

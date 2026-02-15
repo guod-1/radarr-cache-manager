@@ -14,61 +14,64 @@ class ExclusionManager:
 
     def _normalize_path(self, path: str) -> str:
         """
-        Maps container paths to Unraid host paths.
-        Example: /chloe/tv/... -> /mnt/user/chloe/tv/...
+        Forces paths to match the specific /mnt/chloe/data/media structure.
         """
         if not path:
             return ""
             
         clean_path = path.strip()
         
-        # 1. Custom Mapping for 'chloe' share
-        if clean_path.startswith("/chloe"):
-            return clean_path.replace("/chloe", "/mnt/user/chloe", 1)
+        # Detect Movies
+        if "/movies/" in clean_path:
+            # Extract everything after 'movies/' (e.g. /media/movies/Film/Film.mkv -> Film/Film.mkv)
+            try:
+                relative_part = clean_path.split("/movies/", 1)[1]
+                return f"/mnt/chloe/data/media/movies/{relative_part}"
+            except IndexError:
+                pass
+
+        # Detect TV Shows
+        if "/tv/" in clean_path:
+            try:
+                relative_part = clean_path.split("/tv/", 1)[1]
+                return f"/mnt/chloe/data/media/tv/{relative_part}"
+            except IndexError:
+                pass
+        
+        # Fallback: If it already looks correct, keep it.
+        if clean_path.startswith("/mnt/chloe/"):
+            return clean_path
             
-        # 2. Common Unraid mapping (just in case)
-        if clean_path.startswith("/media"):
-            return clean_path.replace("/media", "/mnt/user/media", 1)
-            
+        # Last resort: Return as is (logging might help identify missed patterns)
         return clean_path
 
     def combine_exclusions(self) -> int:
-        """Fresh build of the exclusion file from all sources"""
         all_paths = set()
 
-        # ---------------------------------------------------------
         # A. Manual Folder Exclusions
-        # ---------------------------------------------------------
         if self.settings.exclusions.custom_folders:
             for folder in self.settings.exclusions.custom_folders:
                 all_paths.add(self._normalize_path(folder))
 
-        # ---------------------------------------------------------
         # B. PlexCache-D Exclusions
-        # ---------------------------------------------------------
         plex_cache_file = Path(self.settings.exclusions.plexcache_file_path)
         if plex_cache_file.exists():
             try:
                 with open(plex_cache_file, 'r') as f:
                     for line in f:
                         clean = line.strip()
-                        # Skip empty lines and comments
                         if not clean or clean.startswith('#'):
                             continue
                         all_paths.add(self._normalize_path(clean))
             except Exception as e:
                 logger.error(f"Error reading PlexCache file: {e}")
 
-        # ---------------------------------------------------------
         # C. Gather Target Tags
-        # ---------------------------------------------------------
         target_tags = set(self.settings.exclusions.exclude_tag_ids)
         if self.settings.radarr_tag_operation.search_tag_id:
             target_tags.add(self.settings.radarr_tag_operation.search_tag_id)
 
-        # ---------------------------------------------------------
-        # D. Exclude Movies by Tag (Radarr)
-        # ---------------------------------------------------------
+        # D. Exclude Movies (Checks hasFile=True)
         if target_tags:
             try:
                 radarr = get_radarr_client()
@@ -76,20 +79,18 @@ class ExclusionManager:
                 count = 0
                 for m in movies:
                     m_tags = m.get('tags', [])
-                    # Check if tagged AND has a file
+                    # STRICT CHECK: Must be tagged AND have a file on disk
                     if m.get('hasFile') and any(t in target_tags for t in m_tags):
                         movie_file = m.get('movieFile')
                         if movie_file and 'path' in movie_file:
-                            full_path = movie_file['path']
-                            all_paths.add(self._normalize_path(full_path))
+                            final_path = self._normalize_path(movie_file['path'])
+                            all_paths.add(final_path)
                             count += 1
-                logger.info(f"Found {count} existing movie files matching exclusion tags")
+                logger.info(f"Found {count} existing movie files matching tags")
             except Exception as e:
                 logger.error(f"Radarr exclusion fetch failed: {e}")
 
-        # ---------------------------------------------------------
-        # E. Exclude Shows by Tag (Sonarr)
-        # ---------------------------------------------------------
+        # E. Exclude Shows (Fetches specific episode files)
         if target_tags:
             try:
                 sonarr = get_sonarr_client()
@@ -98,19 +99,18 @@ class ExclusionManager:
                 for s in shows:
                     s_tags = s.get('tags', [])
                     if any(t in target_tags for t in s_tags):
-                        # Fetch specific episode files for this show
+                        # API call fetches ONLY existing files on disk
                         ep_files = sonarr.get_episode_files(s['id'])
                         for ep in ep_files:
                             if 'path' in ep:
-                                all_paths.add(self._normalize_path(ep['path']))
+                                final_path = self._normalize_path(ep['path'])
+                                all_paths.add(final_path)
                                 count += 1
-                logger.info(f"Found {count} existing episode files matching exclusion tags")
+                logger.info(f"Found {count} existing episode files matching tags")
             except Exception as e:
                 logger.error(f"Sonarr exclusion fetch failed: {e}")
 
-        # ---------------------------------------------------------
-        # Write fresh file
-        # ---------------------------------------------------------
+        # Write to file
         try:
             with open(self.output_file, 'w') as f:
                 for path in sorted(list(all_paths)):
@@ -122,10 +122,8 @@ class ExclusionManager:
         return len(all_paths)
 
     def get_exclusion_stats(self) -> dict:
-        """Returns stats about the current exclusion file"""
         if not self.output_file.exists():
             return {"total_count": 0, "file_size": 0}
-        
         try:
             with open(self.output_file, 'r') as f:
                 lines = [l.strip() for l in f if l.strip()]
@@ -134,7 +132,6 @@ class ExclusionManager:
                 "file_size": self.output_file.stat().st_size
             }
         except Exception as e:
-            logger.error(f"Error reading stats: {e}")
             return {"total_count": 0, "file_size": 0}
 
 def get_exclusion_manager():
