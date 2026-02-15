@@ -1,184 +1,75 @@
 {% extends "base.html" %}
 
-{% block title %}Settings - Mover Tuning Exclusion Manager{% endblock %}
-
 {% block content %}
-<div class="px-4 py-6 sm:px-0">
-    <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Settings</h2>
+<div class="max-w-4xl mx-auto space-y-8 pb-12">
+    <h2 class="text-3xl font-bold text-gray-900">Settings</h2>
 
-    <!-- Radarr Connection -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Radarr Connection</h3>
-        <form action="/settings/radarr" method="post" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">URL</label>
-                <input type="text" name="url" value="{{ settings.radarr.url }}" required
-                    class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Example: http://192.168.1.100:7878</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">API Key</label>
-                <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" required
-                    class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="flex justify-between">
-                <button type="submit"
-                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
-                    Save Connection
-                </button>
-                <button type="button" hx-post="/settings/radarr/test" hx-swap="none"
-                    class="inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    Test Connection
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Sonarr Connection -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Sonarr Connection (Optional)</h3>
-        <form action="/settings/sonarr" method="post" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">URL</label>
-                <input type="text" name="url" value="{{ settings.sonarr.url }}"
-                    class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Example: http://192.168.1.100:8989</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">API Key</label>
-                <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}"
-                    class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="flex justify-between">
-                <button type="submit"
-                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
-                    Save Connection
-                </button>
-                <button type="button" hx-post="/settings/sonarr/test" hx-swap="none"
-                    class="inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    Test Connection
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Radarr Tag Operation -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Radarr Tag Operation (Optional)</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Find movies with a specific tag and optionally replace it with another tag.</p>
-        <form action="/settings/radarr-tags" method="post" class="space-y-4">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="bg-white shadow sm:rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Radarr Tag Operation</h3>
+            <p class="mt-1 text-sm text-gray-500">Find movies with a specific tag and optionally replace it.</p>
+        </div>
+        <form action="/settings/radarr-tags" method="POST" class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search for Tag ID</label>
-                    <select name="radarr_search_tag_id" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
-                        <option value="">-- None --</option>
-                        {% for tag in tags %}
+                    <label class="block text-sm font-medium text-gray-700">Search for Tag</label>
+                    <select name="radarr_search_tag_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- None (Skip) --</option>
+                        {% for tag in radarr_tags %}
                         <option value="{{ tag.id }}" {% if settings.radarr_tag_operation.search_tag_id == tag.id %}selected{% endif %}>
-                            {{ tag.label }} (ID: {{ tag.id }})
+                            {{ tag.label }}
                         </option>
                         {% endfor %}
                     </select>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Leave empty to skip tag operations</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Replace with Tag ID (Optional)</label>
-                    <select name="radarr_replace_tag_id" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
+                    <label class="block text-sm font-medium text-gray-700">Replace with Tag (Optional)</label>
+                    <select name="radarr_replace_tag_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         <option value="">-- Don't Replace --</option>
-                        {% for tag in tags %}
+                        {% for tag in radarr_tags %}
                         <option value="{{ tag.id }}" {% if settings.radarr_tag_operation.replace_tag_id == tag.id %}selected{% endif %}>
-                            {{ tag.label }} (ID: {{ tag.id }})
+                            {{ tag.label }}
                         </option>
                         {% endfor %}
                     </select>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Leave empty to just find movies</p>
                 </div>
             </div>
-            <button type="submit"
-                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
-                Save Radarr Tag Settings
-            </button>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save Radarr Tags</button>
         </form>
     </div>
 
-    <!-- Sonarr Tag Operation -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Sonarr Tag Operation (Optional)</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Find TV shows with a specific tag and optionally replace it with another tag.</p>
-        <form action="/settings/sonarr-tags" method="post" class="space-y-4">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="bg-white shadow sm:rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Sonarr Tag Operation</h3>
+            <p class="mt-1 text-sm text-gray-500">Find TV shows with a specific tag and optionally replace it.</p>
+        </div>
+        <form action="/settings/sonarr-tags" method="POST" class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search for Tag ID</label>
-                    <select name="sonarr_search_tag_id" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
-                        <option value="">-- None --</option>
-                        {% for tag in tags %}
+                    <label class="block text-sm font-medium text-gray-700">Search for Tag</label>
+                    <select name="sonarr_search_tag_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- None (Skip) --</option>
+                        {% for tag in sonarr_tags %}
                         <option value="{{ tag.id }}" {% if settings.sonarr_tag_operation.search_tag_id == tag.id %}selected{% endif %}>
-                            {{ tag.label }} (ID: {{ tag.id }})
+                            {{ tag.label }}
                         </option>
                         {% endfor %}
                     </select>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Leave empty to skip tag operations</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Replace with Tag ID (Optional)</label>
-                    <select name="sonarr_replace_tag_id" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
+                    <label class="block text-sm font-medium text-gray-700">Replace with Tag (Optional)</label>
+                    <select name="sonarr_replace_tag_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         <option value="">-- Don't Replace --</option>
-                        {% for tag in tags %}
+                        {% for tag in sonarr_tags %}
                         <option value="{{ tag.id }}" {% if settings.sonarr_tag_operation.replace_tag_id == tag.id %}selected{% endif %}>
-                            {{ tag.label }} (ID: {{ tag.id }})
+                            {{ tag.label }}
                         </option>
                         {% endfor %}
                     </select>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Leave empty to just find shows</p>
                 </div>
             </div>
-            <button type="submit"
-                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
-                Save Sonarr Tag Settings
-            </button>
-        </form>
-    </div>
-
-    <!-- Scheduler -->
-    </div>
-
-    <!-- Scheduler -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Scheduler</h3>
-        <form action="/settings/scheduler" method="post" class="space-y-4">
-            <div class="flex items-center">
-                <input type="checkbox" name="enabled" value="true" {% if settings.scheduler.enabled %}checked{% endif %}
-                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                <label class="ml-2 block text-sm text-gray-900 dark:text-gray-100">Enable automatic runs</label>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cron Expression</label>
-                <input type="text" name="cron_expression" value="{{ settings.scheduler.cron_expression }}" required
-                    class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Example: "0 */6 * * *" = every 6 hours</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">CA Mover Log Check Schedule</label>
-                <input type="text" name="ca_mover_check_cron" value="{{ settings.scheduler.ca_mover_check_cron }}" required
-                    class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-100">
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Example: "30 23 * * *" = daily at 11:30 PM</p>
-            </div>
-            <button type="submit"
-                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
-                Save Scheduler
-            </button>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save Sonarr Tags</button>
         </form>
     </div>
 </div>
-
-<script>
-    document.body.addEventListener('htmx:afterRequest', function(event) {
-        if (event.detail.successful) {
-            const url = event.detail.xhr.responseURL;
-            if (url.includes('/settings/radarr/test')) {
-                const response = JSON.parse(event.detail.xhr.responseText);
-                alert(response.message);
-            }
-        }
-    });
-</script>
 {% endblock %}
