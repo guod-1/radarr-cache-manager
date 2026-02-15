@@ -51,12 +51,28 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Sonarr exclusion fetch failed: {e}")
 
-        # Write fresh file (this overwrites the old one)
+        # Write fresh file
         with open(self.output_file, 'w') as f:
             for path in sorted(list(all_paths)):
                 f.write(f"{path}\n")
 
         return len(all_paths)
+
+    def get_exclusion_stats(self) -> dict:
+        """Returns stats about the current exclusion file"""
+        if not self.output_file.exists():
+            return {"total_count": 0, "file_size": 0}
+        
+        try:
+            with open(self.output_file, 'r') as f:
+                lines = [l.strip() for l in f if l.strip()]
+            return {
+                "total_count": len(lines),
+                "file_size": self.output_file.stat().st_size
+            }
+        except Exception as e:
+            logger.error(f"Error reading stats: {e}")
+            return {"total_count": 0, "file_size": 0}
 
 def get_exclusion_manager():
     return ExclusionManager()
