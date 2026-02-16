@@ -28,6 +28,30 @@
     </div>
 
     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg mb-8 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
+            <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-tv mr-2 text-primary-500"></i> Sonarr Connection</h2>
+            {% if request.query_params.get('sonarr_status') == 'success' %}
+                <span class="text-green-400 text-xs font-bold uppercase tracking-wider bg-green-900/30 px-2 py-1 rounded">Connected</span>
+            {% endif %}
+        </div>
+        <div class="p-6">
+            <form action="/settings/sonarr/save" method="POST" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Sonarr URL</label>
+                        <input type="text" name="url" value="{{ settings.sonarr.url }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">API Key</label>
+                        <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none">
+                    </div>
+                </div>
+                <div class="flex justify-end"><button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 px-6 rounded-lg transition">Save & Test</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg mb-8 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-700 bg-gray-850">
             <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-folder-tree mr-2 text-primary-500"></i> System Paths & Normalization</h2>
         </div>
@@ -54,30 +78,6 @@
                     <input type="text" name="ca_mover_log_path" value="{{ settings.exclusions.ca_mover_log_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm">
                 </div>
                 <div class="flex justify-end"><button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 px-6 rounded-lg transition">Save System Paths</button></div>
-            </form>
-        </div>
-    </div>
-
-    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg mb-8 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
-            <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-tv mr-2 text-primary-500"></i> Sonarr Connection</h2>
-            {% if request.query_params.get('sonarr_status') == 'success' %}
-                <span class="text-green-400 text-xs font-bold uppercase tracking-wider bg-green-900/30 px-2 py-1 rounded">Connected</span>
-            {% endif %}
-        </div>
-        <div class="p-6">
-            <form action="/settings/sonarr/save" method="POST" class="space-y-5">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-2">Sonarr URL</label>
-                        <input type="text" name="url" value="{{ settings.sonarr.url }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-2">API Key</label>
-                        <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none">
-                    </div>
-                </div>
-                <div class="flex justify-end"><button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 px-6 rounded-lg transition">Save & Test</button></div>
             </form>
         </div>
     </div>
