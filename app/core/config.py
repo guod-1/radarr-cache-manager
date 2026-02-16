@@ -11,14 +11,13 @@ class SchedulerSettings(BaseModel):
 
 class ExclusionSettings(BaseModel):
     custom_folders: List[str] = []
-    # Legacy field kept for safety
-    exclude_tag_ids: List[int] = []
-    # New fields required by routers
     radarr_exclude_tag_ids: List[int] = []
     sonarr_exclude_tag_ids: List[int] = []
     plexcache_file_path: str = "/plexcache/unraid_mover_exclusions.txt"
-    # UPDATED: Default to local logs folder
     ca_mover_log_path: str = "/config/logs/mover.log"
+    # Configurable Base Paths
+    movie_base_path: str = "/mnt/chloe/data/media/movies/"
+    tv_base_path: str = "/mnt/chloe/data/media/tv/"
     last_build: Optional[str] = None
 
 class RadarrSettings(BaseModel):

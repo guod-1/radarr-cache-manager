@@ -15,12 +15,15 @@ class ExclusionManager:
     def _normalize_path(self, path: str) -> str:
         if not path: return ""
         clean = path.strip().strip('"').strip("'")
+        settings = get_user_settings()
+        
+        # Use configurable base paths from settings
         if "/movies/" in clean.lower():
             idx = clean.lower().find("/movies/")
-            return f"/mnt/chloe/data/media/movies/{clean[idx+8:]}"
+            return f"{settings.exclusions.movie_base_path.rstrip('/')}/{clean[idx+8:].lstrip('/')}"
         if "/tv/" in clean.lower():
             idx = clean.lower().find("/tv/")
-            return f"/mnt/chloe/data/media/tv/{clean[idx+4:]}"
+            return f"{settings.exclusions.tv_base_path.rstrip('/')}/{clean[idx+4:].lstrip('/')}"
         return clean
 
     def combine_exclusions(self) -> int:
@@ -28,11 +31,9 @@ class ExclusionManager:
         all_paths = set()
         settings = get_user_settings()
 
-        # 1. Manual Folders
         for folder in settings.exclusions.custom_folders:
             all_paths.add(self._normalize_path(folder))
 
-        # 2. PlexCache File
         pc_path = Path(settings.exclusions.plexcache_file_path)
         if pc_path.exists():
             with open(pc_path, 'r') as f:
@@ -41,7 +42,6 @@ class ExclusionManager:
                         all_paths.add(self._normalize_path(line))
             logger.info(f"Integrated lines from {pc_path}")
 
-        # 3. Media Tags - Radarr
         radarr_tags = set(settings.exclusions.radarr_exclude_tag_ids)
         if radarr_tags:
             try:
@@ -52,7 +52,6 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Error processing Radarr tags: {e}")
 
-        # 4. Media Tags - Sonarr
         sonarr_tags = set(settings.exclusions.sonarr_exclude_tag_ids)
         if sonarr_tags:
             try:
@@ -63,14 +62,12 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Error processing Sonarr tags: {e}")
 
-        # Write file
         final_list = sorted([p for p in all_paths if p])
         os.makedirs(self.output_file.parent, exist_ok=True)
         with open(self.output_file, 'w') as f:
             for path in final_list:
                 f.write(f"{path}\n")
         
-        # Update timestamp
         settings.exclusions.last_build = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         save_user_settings(settings)
         
@@ -83,7 +80,6 @@ class ExclusionManager:
             return {"total_count": len([l for l in f if l.strip()])}
 
     def get_all_exclusions(self):
-        """Returns list of all exclusions for the viewer"""
         if not self.output_file.exists(): return []
         with open(self.output_file, 'r') as f:
             return [line.strip() for line in f if line.strip()]
