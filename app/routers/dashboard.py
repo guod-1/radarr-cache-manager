@@ -24,14 +24,14 @@ async def dashboard_page(request: Request):
         "stats": stats,
         "cache_usage": cache_usage,
         "exclusion_count": exclusion_stats.get("total_count", 0),
-        "radarr_online": True, # Optimized out of main load
+        "radarr_online": True,
         "sonarr_online": True,
         "check_time": datetime.datetime.now().strftime("%H:%M:%S")
     })
 
 @router.get("/stats/refresh", response_class=HTMLResponse)
 async def refresh_stats(request: Request):
-    logger.info("Manual Mover Log check triggered via Dashboard.")
+    # This must ONLY return the partial, not the full dashboard
     mover_parser = get_mover_parser()
     stats = mover_parser.get_latest_stats()
     return templates.TemplateResponse("partials/mover_stats_card.html", {

@@ -7,7 +7,7 @@
             {% if check_time %}
             <span class="text-[10px] text-gray-500 font-mono">Last Checked: {{ check_time }}</span>
             {% endif %}
-            <button hx-get="/dashboard/stats/refresh" 
+            <button hx-get="/dashboard/stats/refresh" hx-target="#mover-stats-card" hx-swap="outerHTML" 
                     hx-target="#mover-stats-card" 
                     hx-swap="outerHTML"
                     hx-indicator="#stats-spinner"
