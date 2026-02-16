@@ -1,53 +1,89 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="space-y-6">
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
-            <div class="text-sm font-medium text-gray-500">Radarr Status</div>
-            <div class="text-lg font-bold {% if radarr_connected %}text-green-600{% else %}text-red-600{% endif %}">
-                {% if radarr_connected %}Connected{% else %}Disconnected{% endif %}
-            </div>
 
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
-            <div class="text-sm font-medium text-gray-500">Sonarr Status</div>
-            <div class="text-lg font-bold {% if sonarr_connected %}text-green-600{% else %}text-red-600{% endif %}">
-                {% if sonarr_connected %}Connected{% else %}Disconnected{% endif %}
-            </div>
-
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
-            <div class="text-sm font-medium text-gray-500">Total Exclusions</div>
-            <div id="dashboard-exclusion-count" class="text-2xl font-bold">{{ exclusion_count }}</div>
-            <div class="text-xs text-gray-400">Last Build: {{ last_run_exclusion }}</div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
-            <div class="text-sm font-medium text-gray-500">Mover Status</div>
-            <div class="text-lg font-bold">{{ ca_mover_status }}</div>
-            <div class="text-xs text-gray-400">Last Check: {{ last_run_mover }}</div>
-        </div>
+<div class="mb-8 flex justify-between items-end">
+    <div>
+        <h1 class="text-3xl font-bold text-white">Dashboard</h1>
+        <p class="text-gray-400 mt-1">System Overview & Status</p>
     </div>
-
-    <div class="bg-white dark:bg-gray-800 p-6 shadow rounded-lg">
-        <h3 class="font-bold mb-4 text-gray-900 dark:text-white">Run Operations</h3>
-        
-        <div id="loading-indicator" class="htmx-indicator flex items-center text-blue-500 mb-4">
-            <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <span>Building Exclusion File... Please wait.</span>
-        </div>
-
-        <div class="flex space-x-4">
-            <button hx-post="/operations/run/exclusions" 
-                    hx-target="#op-result" 
-                    hx-indicator="#loading-indicator" 
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-medium transition">
-                Build Exclusion File Now
-            </button>
-        </div>
-        <div id="op-result" class="mt-4"></div>
+    <div class="flex space-x-3">
+        <button hx-post="/operations/run/exclusions" 
+                hx-target="#op-result" 
+                hx-indicator="#loading-indicator"
+                class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-700 transition flex items-center">
+            <i class="fa-solid fa-sync mr-2 text-primary-500"></i> Build Exclusions
+        </button>
     </div>
 </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    
+    <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+            <i class="fa-solid fa-film text-6xl"></i>
+        </div>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-400 font-medium">Radarr</h3>
+            <span class="px-2 py-1 rounded text-xs font-bold {% if radarr_connected %}bg-green-900 text-green-300 border border-green-700{% else %}bg-red-900 text-red-300 border border-red-700{% endif %}">
+                {% if radarr_connected %}ONLINE{% else %}OFFLINE{% endif %}
+            </span>
+        </div>
+        <div class="text-sm text-gray-500">Movie Indexer Status</div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+            <i class="fa-solid fa-tv text-6xl"></i>
+        </div>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-400 font-medium">Sonarr</h3>
+            <span class="px-2 py-1 rounded text-xs font-bold {% if sonarr_connected %}bg-green-900 text-green-300 border border-green-700{% else %}bg-red-900 text-red-300 border border-red-700{% endif %}">
+                {% if sonarr_connected %}ONLINE{% else %}OFFLINE{% endif %}
+            </span>
+        </div>
+        <div class="text-sm text-gray-500">Series Indexer Status</div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg">
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="text-gray-400 font-medium">Total Exclusions</h3>
+            <i class="fa-solid fa-shield-halved text-primary-500"></i>
+        </div>
+        <div id="dashboard-exclusion-count" class="text-3xl font-bold text-white mb-1">{{ exclusion_count }}</div>
+        <div class="text-xs text-gray-500">Last built: {{ last_build }}</div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg">
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="text-gray-400 font-medium">Mover Tuning</h3>
+            <i class="fa-solid fa-hard-drive text-orange-500"></i>
+        </div>
+        <div class="text-lg font-bold text-white mb-1 truncate" title="{{ ca_mover_status }}">{{ ca_mover_status }}</div>
+        <div class="text-xs text-gray-500">Last check: {{ last_run_mover }}</div>
+    </div>
+</div>
+
+<div id="loading-indicator" class="htmx-indicator mb-6 bg-blue-900/30 border border-blue-800 text-blue-200 px-4 py-3 rounded-lg flex items-center">
+    <i class="fa-solid fa-circle-notch fa-spin mr-3"></i>
+    <span>Processing exclusion list... This may take a moment.</span>
+</div>
+
+<div id="op-result"></div>
+
+<div class="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-8 border border-gray-700 shadow-lg">
+    <h2 class="text-2xl font-bold mb-4">Welcome to Exclusion Manager</h2>
+    <p class="text-gray-400 max-w-2xl leading-relaxed">
+        This system automatically protects your high-quality media from being moved off the cache drive. 
+        It integrates with Radarr, Sonarr, and PlexCache-D to generate a comprehensive exclusion list for the Unraid Mover.
+    </p>
+    <div class="mt-6 flex gap-4">
+        <a href="/settings" class="text-primary-500 hover:text-primary-400 font-medium text-sm flex items-center">
+            Configure Thresholds <i class="fa-solid fa-arrow-right ml-2"></i>
+        </a>
+        <a href="/logs" class="text-gray-500 hover:text-gray-300 font-medium text-sm flex items-center">
+            View System Logs <i class="fa-solid fa-list ml-2"></i>
+        </a>
+    </div>
+</div>
+
 {% endblock %}
