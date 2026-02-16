@@ -1,5 +1,5 @@
 import logging
-from apscheduler.schedulers.asyncio import AsyncioScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.core.config import get_user_settings
 from app.services.operations import run_full_sync
 
@@ -7,12 +7,13 @@ logger = logging.getLogger(__name__)
 
 class SchedulerService:
     def __init__(self):
-        self.scheduler = AsyncioScheduler()
+        # Changed to AsyncIOScheduler (standard name)
+        self.scheduler = AsyncIOScheduler()
 
     def start(self):
         settings = get_user_settings()
         if settings.scheduler.enabled:
-            # We wrap the call so it doesn't try to await a non-async result
+            # We add a standard job that calls our non-async sync function
             self.scheduler.add_job(
                 self._run_sync_job, 
                 'cron', 
@@ -26,7 +27,7 @@ class SchedulerService:
     def _run_sync_job(self):
         logger.info("Scheduler: Starting scheduled sync...")
         try:
-            # run_full_sync is a standard function, no await needed
+            # Call the synchronous function
             run_full_sync()
             logger.info("Scheduler: Scheduled sync complete.")
         except Exception as e:
@@ -34,6 +35,8 @@ class SchedulerService:
 
     def _parse_cron(self, cron_str):
         parts = cron_str.split()
+        if len(parts) < 5:
+             return {'minute': '0', 'hour': '*/6'}
         return {
             'minute': parts[0],
             'hour': parts[1],
