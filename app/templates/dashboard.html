@@ -5,38 +5,39 @@
         <h1 class="text-3xl font-bold text-white">System Dashboard</h1>
         <p class="text-gray-400 mt-1">Real-time status of your Cache Exclusions</p>
     </div>
-    <button hx-post="/operations/run/all" hx-indicator="#loading-indicator" class="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg font-medium transition">
-        <i class="fa-solid fa-play mr-2"></i> Run Full Sync
-    </button>
+    <div class="flex space-x-3">
+        <button hx-post="/operations/run/exclusions" hx-target="#op-result" hx-indicator="#loading-indicator"
+                class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-700 transition flex items-center">
+            <i class="fa-solid fa-sync mr-2 text-primary-500"></i> Build Exclusions
+        </button>
+    </div>
 </div>
 
 <div class="grid grid-cols-1 gap-6 mb-8">
     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
         <div class="px-6 py-4 bg-gray-850 border-b border-gray-700 flex justify-between items-center">
             <h3 class="font-bold text-white"><i class="fa-solid fa-gauge-high mr-2 text-orange-500"></i> Mover Efficiency</h3>
-            <span class="text-xs text-gray-500">Source: {{ ca_mover_status }}</span>
+            <span class="text-xs text-gray-500">Log: {{ ca_mover_status }}</span>
         </div>
         <div class="p-6 flex flex-col md:flex-row gap-8 items-center">
-            <div class="relative h-32 w-32">
-                <div class="flex items-center justify-center h-full w-full rounded-full border-8 border-primary-600">
-                    <span class="text-2xl font-bold text-white">{{ ca_efficiency }}%</span>
-                </div>
+            <div class="relative h-28 w-28 flex items-center justify-center rounded-full border-8 border-primary-600 bg-gray-900 shadow-inner">
+                <span class="text-2xl font-bold text-white">{{ ca_efficiency }}%</span>
             </div>
             <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-                <div class="bg-gray-900/50 p-4 rounded-lg">
-                    <div class="text-xs text-gray-500 uppercase">Protected</div>
+                <div class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                    <div class="text-xs text-gray-500 uppercase font-bold">Protected</div>
                     <div class="text-xl font-bold text-green-400">{{ ca_mover_excluded }} Files</div>
                 </div>
-                <div class="bg-gray-900/50 p-4 rounded-lg">
-                    <div class="text-xs text-gray-500 uppercase">Moved to Array</div>
+                <div class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                    <div class="text-xs text-gray-500 uppercase font-bold">Moved to Array</div>
                     <div class="text-xl font-bold text-orange-400">{{ ca_mover_moved }} Files</div>
                 </div>
-                <div class="bg-gray-900/50 p-4 rounded-lg">
-                    <div class="text-xs text-gray-500 uppercase">Space Saved</div>
+                <div class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                    <div class="text-xs text-gray-500 uppercase font-bold">Space Kept</div>
                     <div class="text-xl font-bold text-blue-400">{{ ca_space_saved }}</div>
                 </div>
-                <div class="bg-gray-900/50 p-4 rounded-lg">
-                    <div class="text-xs text-gray-500 uppercase">Last Run</div>
+                <div class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                    <div class="text-xs text-gray-500 uppercase font-bold">Last Run</div>
                     <div class="text-sm font-medium text-gray-300">{{ ca_mover_last_run }}</div>
                 </div>
             </div>
@@ -44,4 +45,37 @@
     </div>
 </div>
 
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg flex flex-col justify-between">
+        <h3 class="text-gray-400 font-medium">Radarr Status</h3>
+        <div class="mt-2 flex items-center justify-between">
+            <span class="px-2 py-1 rounded text-xs font-bold {% if radarr_connected %}bg-green-900 text-green-300{% else %}bg-red-900 text-red-300{% endif %}">
+                {% if radarr_connected %}ONLINE{% else %}OFFLINE{% endif %}
+            </span>
+            <i class="fa-solid fa-film text-gray-600"></i>
+        </div>
+    </div>
+    <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg flex flex-col justify-between">
+        <h3 class="text-gray-400 font-medium">Sonarr Status</h3>
+        <div class="mt-2 flex items-center justify-between">
+            <span class="px-2 py-1 rounded text-xs font-bold {% if sonarr_connected %}bg-green-900 text-green-300{% else %}bg-red-900 text-red-300{% endif %}">
+                {% if sonarr_connected %}ONLINE{% else %}OFFLINE{% endif %}
+            </span>
+            <i class="fa-solid fa-tv text-gray-600"></i>
+        </div>
+    </div>
+    <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg flex flex-col justify-between">
+        <h3 class="text-gray-400 font-medium">Total Exclusions</h3>
+        <div class="mt-2 flex items-center justify-between">
+            <div id="dashboard-exclusion-count" class="text-2xl font-bold text-white">{{ exclusion_count }}</div>
+            <i class="fa-solid fa-shield-halved text-primary-500"></i>
+        </div>
+    </div>
+</div>
+
+<div id="loading-indicator" class="htmx-indicator mb-6 bg-blue-900/30 border border-blue-800 text-blue-200 px-4 py-3 rounded-lg flex items-center">
+    <i class="fa-solid fa-circle-notch fa-spin mr-3"></i>
+    <span>Processing exclusions...</span>
+</div>
+<div id="op-result"></div>
 {% endblock %}

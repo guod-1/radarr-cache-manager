@@ -20,13 +20,10 @@ async def exclusions_page(request: Request):
     tags, sonarr_tags = [], []
     try:
         tags = radarr_client.get_all_tags()
-    except Exception as e:
-        logger.error(f"Failed to fetch Radarr tags: {e}")
-    
+    except Exception: pass
     try:
         sonarr_tags = sonarr_client.get_all_tags()
-    except Exception as e:
-        logger.error(f"Failed to fetch Sonarr tags: {e}")
+    except Exception: pass
     
     excl_manager = get_exclusion_manager()
     stats = excl_manager.get_exclusion_stats()

@@ -11,39 +11,49 @@ import os
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
+def format_filesize(value):
+    if not value: return "0 B"
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if value < 1024.0:
+            return f"{value:3.1f} {unit}"
+        value /= 1024.0
+    return f"{value:.1f} PB"
 
 @router.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     mover = get_mover_parser()
     excl = get_exclusion_manager()
     
-    # Test connections
     radarr_connected = get_radarr_client().test_connection()
     sonarr_connected = get_sonarr_client().test_connection()
     
-    # Get stats
-    mover_stats = mover.get_latest_stats()
+    mover_stats = mover.get_stats_for_file()
     excl_stats = excl.get_exclusion_stats()
     
-    last_check = "N/A"
-    status_text = "No logs found"
-    if mover_stats:
-        status_text = f"{mover_stats['excluded']} Excluded / {mover_stats['moved']} Moved"
-        last_check = datetime.datetime.fromtimestamp(mover_stats['timestamp']).strftime('%Y-%m-%d %H:%M')
+    # Calculate Mover Health Stats
+    ca_efficiency = mover_stats['efficiency'] if mover_stats else 0
+    ca_mover_excluded = mover_stats['excluded'] if mover_stats else 0
+    ca_mover_moved = mover_stats['moved'] if mover_stats else 0
+    ca_space_saved = format_filesize(mover_stats['total_bytes_kept']) if mover_stats else "0 B"
+    ca_mover_last_run = datetime.datetime.fromtimestamp(mover_stats['timestamp']).strftime('%Y-%m-%d %H:%M') if mover_stats else "Never"
+    ca_mover_status = mover_stats['filename'] if mover_stats else "No logs found"
     
-    # Get last build time from mover_exclusions.txt file modification time
+    # Last build time
     last_build = "Never"
     exclusions_file = "/config/mover_exclusions.txt"
     if os.path.exists(exclusions_file):
-        mtime = os.path.getmtime(exclusions_file)
-        last_build = datetime.datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M')
+        last_build = datetime.datetime.fromtimestamp(os.path.getmtime(exclusions_file)).strftime('%Y-%m-%d %H:%M')
     
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "radarr_connected": radarr_connected,
         "sonarr_connected": sonarr_connected,
-        "ca_mover_status": status_text,
+        "ca_efficiency": ca_efficiency,
+        "ca_mover_excluded": ca_mover_excluded,
+        "ca_mover_moved": ca_mover_moved,
+        "ca_space_saved": ca_space_saved,
+        "ca_mover_last_run": ca_mover_last_run,
+        "ca_mover_status": ca_mover_status,
         "exclusion_count": excl_stats.get("total_count", 0),
-        "last_run_mover": last_check,
         "last_build": last_build
     })
