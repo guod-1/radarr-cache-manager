@@ -7,12 +7,11 @@
             {% if check_time %}
             <span class="text-[10px] text-gray-500 font-mono">Last Checked: {{ check_time }}</span>
             {% endif %}
-            <button hx-get="/dashboard/stats/refresh" hx-target="#mover-stats-card" hx-swap="outerHTML" 
+            <button hx-get="/dashboard/stats/refresh" 
                     hx-target="#mover-stats-card" 
                     hx-swap="outerHTML"
-                    hx-indicator="#stats-spinner"
                     class="flex items-center bg-gray-700 hover:bg-gray-600 text-white text-xs py-1.5 px-3 rounded-md transition border border-gray-600">
-                <i id="stats-spinner" class="fa-solid fa-arrows-rotate mr-2 htmx-indicator"></i>
+                <i class="fa-solid fa-arrows-rotate mr-2"></i>
                 Check Latest Log
             </button>
         </div>
@@ -35,8 +34,7 @@
             </div>
         {% else %}
             <div class="py-6 text-center">
-                <i class="fa-solid fa-magnifying-glass text-gray-700 text-3xl mb-2"></i>
-                <p class="text-sm text-gray-500 italic">No activity logs found in /mover_logs</p>
+                <p class="text-sm text-gray-500 italic">No activity logs found</p>
             </div>
         {% endif %}
     </div>
