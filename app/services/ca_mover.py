@@ -12,53 +12,47 @@ class MoverLogParser:
         self.log_dir = log_dir
 
     def get_cache_usage(self):
-        """Calculates disk usage for the configured cache drive mount point"""
         try:
             settings = get_user_settings()
             path = settings.exclusions.cache_mount_path
-            
-            # Fail silently/gracefully if path doesn't exist to avoid log spam
             if not path or not os.path.exists(path):
                 return {"total": 1, "used": 0, "free": 0, "percent": 0}
-                
             usage = shutil.disk_usage(path)
             percent = (usage.used / usage.total) * 100 if usage.total > 0 else 0
             return {
-                "total": usage.total,
-                "used": usage.used,
-                "free": usage.free,
-                "percent": round(percent, 1)
+                "total": usage.total, "used": usage.used, "free": usage.free, "percent": round(percent, 1)
             }
         except Exception:
-            # Suppress errors for dashboard cleanliness
             return {"total": 1, "used": 0, "free": 0, "percent": 0}
+
+    def _get_latest_file(self, pattern):
+        """Finds the most recent file matching a pattern in the log directory"""
+        files = glob.glob(os.path.join(self.log_dir, pattern))
+        if not files:
+            return None
+        return max(files, key=os.path.getmtime)
 
     def get_latest_stats(self):
         try:
-            list_of_files = glob.glob(f'{self.log_dir}/Filtered_files_*.list')
-            if not list_of_files:
-                list_of_files = glob.glob(f'{self.log_dir}/*.log')
-            if not list_of_files: return None
+            # Look for the latest Mover Tuning log
+            latest_log = self._get_latest_file("Mover_tuning_*.log")
+            # Look for the latest Filtered list (which tells us what was skipped/moved)
+            latest_list = self._get_latest_file("Filtered_files_*.list")
             
-            latest_file = max(list_of_files, key=os.path.getctime)
-            
-            run_file = None
-            for f in sorted(list_of_files, key=os.path.getctime, reverse=True):
-                if os.path.getsize(f) > 500:
-                    run_file = f
-                    break
+            if not latest_log or not latest_list:
+                return None
             
             stats = {
-                "filename": os.path.basename(latest_file),
-                "is_run": os.path.getsize(latest_file) > 500,
+                "filename": os.path.basename(latest_log),
+                "is_run": os.path.getsize(latest_list) > 500, # If list is tiny, it was just a check
                 "excluded": 0,
                 "moved": 0,
                 "total_bytes_kept": 0,
-                "timestamp": os.path.getmtime(latest_file),
-                "last_run_timestamp": os.path.getmtime(run_file) if run_file else None
+                "timestamp": os.path.getmtime(latest_log),
+                "last_run_timestamp": os.path.getmtime(latest_list)
             }
 
-            with open(latest_file, 'r') as f:
+            with open(latest_list, 'r') as f:
                 for line in f:
                     if "|" in line:
                         parts = line.strip().split("|")
@@ -72,7 +66,7 @@ class MoverLogParser:
                                 stats["moved"] += 1
             return stats
         except Exception as e:
-            logger.error(f"Failed to parse mover logs: {e}")
+            logger.error(f"Failed to parse timestamped mover logs: {e}")
             return None
 
 def get_mover_parser():
