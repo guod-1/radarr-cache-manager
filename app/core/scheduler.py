@@ -2,8 +2,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from app.core.config import get_user_settings
-from app.services.exclusions import run_full_operation
-from app.services.ca_mover import check_ca_mover_logs
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,6 +15,10 @@ class CacheScheduler:
     def start(self):
         settings = get_user_settings()
         
+        # We import inside the function to avoid Circular Import errors
+        from app.services.exclusions import run_full_operation
+        from app.services.ca_mover import check_ca_mover_logs
+
         # 1. Schedule Full Sync (Cron)
         cron_val = settings.exclusions.full_sync_cron or "0 * * * *"
         self.scheduler.add_job(
@@ -39,7 +41,6 @@ class CacheScheduler:
         logger.info(f"Scheduler started: Full Sync ({cron_val}), Log Monitor ({interval_val}s)")
 
     def reload_jobs(self):
-        """Called after settings update to refresh schedules without restarting app"""
         settings = get_user_settings()
         
         # Update Full Sync
@@ -60,5 +61,4 @@ class CacheScheduler:
     def shutdown(self):
         self.scheduler.shutdown()
 
-# Global instance
 scheduler = CacheScheduler()
