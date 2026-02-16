@@ -5,29 +5,28 @@ from typing import List, Optional
 
 CONFIG_PATH = "/config/settings.json"
 
-
-
-
-
 class SchedulerSettings(BaseModel):
     enabled: bool = True
     cron_expression: str = "0 */6 * * *"
 
 class ExclusionSettings(BaseModel):
     custom_folders: List[str] = []
+    # Legacy field kept for safety
     exclude_tag_ids: List[int] = []
+    # New fields required by routers
+    radarr_exclude_tag_ids: List[int] = []
+    sonarr_exclude_tag_ids: List[int] = []
     plexcache_file_path: str = "/plexcache/unraid_mover_exclusions.txt"
-
+    ca_mover_log_path: str = "/mover_logs"
+    last_build: Optional[str] = None
 
 class RadarrSettings(BaseModel):
     url: str = ""
     api_key: str = ""
 
-
 class SonarrSettings(BaseModel):
     url: str = ""
     api_key: str = ""
-
 
 class UserSettings(BaseModel):
     radarr: RadarrSettings = RadarrSettings()

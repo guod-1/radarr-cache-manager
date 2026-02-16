@@ -41,21 +41,28 @@ class ExclusionManager:
                         all_paths.add(self._normalize_path(line))
             logger.info(f"Integrated lines from {pc_path}")
 
-        # 3. Media Tags
-        target_tags = set(settings.exclusions.exclude_tag_ids)
-        if target_tags:
+        # 3. Media Tags - Radarr
+        radarr_tags = set(settings.exclusions.radarr_exclude_tag_ids)
+        if radarr_tags:
             try:
                 movies = get_radarr_client().get_all_movies()
                 for m in movies:
-                    if m.get('hasFile') and any(t in target_tags for t in m.get('tags', [])):
+                    if m.get('hasFile') and any(t in radarr_tags for t in m.get('tags', [])):
                         all_paths.add(self._normalize_path(m['movieFile']['path']))
-            except: pass
+            except Exception as e:
+                logger.error(f"Error processing Radarr tags: {e}")
+
+        # 4. Media Tags - Sonarr
+        sonarr_tags = set(settings.exclusions.sonarr_exclude_tag_ids)
+        if sonarr_tags:
             try:
-                shows = get_sonarr_client().get_all_shows()
+                # FIXED: Changed from get_all_shows to get_all_series
+                shows = get_sonarr_client().get_all_series()
                 for s in shows:
-                    if any(t in target_tags for t in s.get('tags', [])):
+                    if any(t in sonarr_tags for t in s.get('tags', [])):
                         all_paths.add(self._normalize_path(s['path']))
-            except: pass
+            except Exception as e:
+                logger.error(f"Error processing Sonarr tags: {e}")
 
         # Write file
         final_list = sorted([p for p in all_paths if p])
@@ -65,6 +72,8 @@ class ExclusionManager:
                 f.write(f"{path}\n")
         
         # Update timestamp
+        # FIXED: This line was missing, causing the crash
+        settings.exclusions.last_build = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         save_user_settings(settings)
         
         logger.info(f"!!! COMPLETED !!! Total items: {len(final_list)}")
