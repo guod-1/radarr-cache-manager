@@ -16,49 +16,42 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg p-6">
-            <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Active Exclusions</h3>
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <h3 class="text-sm font-medium text-gray-400 uppercase mb-4">Active Exclusions</h3>
             <div class="flex items-baseline">
-                <span id="exclusion-val" class="text-4xl font-bold text-white">{{ exclusion_count|default(0) }}</span>
+                <span class="text-4xl font-bold text-white">{{ exclusion_count|default(0) }}</span>
                 <span class="ml-2 text-sm text-gray-500">on Cache</span>
             </div>
-            <p class="text-[10px] text-gray-600 mt-2 italic">Verified via /mnt/chloe</p>
         </div>
 
-        <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg p-6">
-            <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Cache Usage</h3>
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <h3 class="text-sm font-medium text-gray-400 uppercase mb-4">Cache Usage</h3>
             <div class="w-full bg-gray-900 rounded-full h-2.5 mb-2">
                 <div class="bg-orange-500 h-2.5 rounded-full" style="width: {{ cache_usage.percent|default(0) }}%"></div>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-white font-medium">{{ cache_usage.percent|default(0) }}% Full</span>
-                <span class="text-gray-500">{{ (cache_usage.used / 1024 / 1024 / 1024) | round(1) }} GB</span>
+                <span class="text-white">{{ cache_usage.percent|default(0) }}% Full</span>
             </div>
         </div>
 
-        <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg p-5 space-y-3">
-            <div class="flex items-center justify-between border-b border-gray-700 pb-2 mb-1">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5 space-y-3">
+            <div class="flex items-center justify-between border-b border-gray-700 pb-2">
                 <span class="text-[10px] font-bold text-gray-500 uppercase">System Status</span>
-                <div class="flex items-center">
-                    <span class="h-2 w-2 rounded-full bg-slate-600 mr-2"></span>
-                    <span class="text-[10px] font-medium text-gray-400">MOVER IDLE</span>
-                </div>
+                <span class="text-[10px] text-gray-400">MOVER IDLE</span>
             </div>
             <div class="grid grid-cols-2 gap-2">
-                <div class="flex items-center justify-between px-3 py-2 bg-gray-900 rounded-lg border border-gray-800">
+                <div class="flex items-center justify-between px-3 py-2 bg-gray-900 rounded-lg">
                     <span class="text-[11px] text-gray-400">Radarr</span>
-                    <span class="h-1.5 w-1.5 rounded-full {% if radarr_online %}bg-green-500{% else %}bg-red-500{% endif %}"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                 </div>
-                <div class="flex items-center justify-between px-3 py-2 bg-gray-900 rounded-lg border border-gray-800">
+                <div class="flex items-center justify-between px-3 py-2 bg-gray-900 rounded-lg">
                     <span class="text-[11px] text-gray-400">Sonarr</span>
-                    <span class="h-1.5 w-1.5 rounded-full {% if sonarr_online %}bg-green-500{% else %}bg-red-500{% endif %}"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-8">
-        {% include "partials/mover_stats_card.html" %}
-    </div>
+    {% include "partials/mover_stats_card.html" %}
 </div>
 {% endblock %}

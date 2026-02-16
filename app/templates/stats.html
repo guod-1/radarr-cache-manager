@@ -1,17 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="max-w-6xl mx-auto space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-white">System Statistics</h1>
-        <span class="text-sm text-gray-500 italic">Data from: {{ stats.filename if stats else 'No Log Found' }}</span>
+    <h1 class="text-3xl font-bold text-white">System Statistics</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Latest Run Summary</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-xs text-gray-500">Protected Files</p>
+                    <p class="text-2xl font-bold text-primary-400">{{ stats.excluded }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Moved to Array</p>
+                    <p class="text-2xl font-bold text-orange-400">{{ stats.moved }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Log Metadata</h2>
+            <p class="text-xs text-gray-400 font-mono truncate">{{ stats.filename }}</p>
+            <p class="text-xs text-gray-500 mt-2">Type: <span class="text-white">{{ stats.type_label }}</span></p>
+        </div>
     </div>
 
-    {% if stats %}
     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
         <div class="px-6 py-4 bg-gray-850 border-b border-gray-700">
-            <h2 class="text-lg font-semibold text-white">Detailed Protection Breakdown</h2>
+            <h2 class="text-lg font-semibold text-white">Files Currently Protected on Cache</h2>
         </div>
-        <div class="p-0">
+        <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-700 bg-gray-900">
                 <thead>
                     <tr class="text-left text-[11px] text-gray-400 uppercase font-bold bg-gray-950">
@@ -25,15 +43,14 @@
                         <td class="px-6 py-3 text-gray-300 font-mono text-xs truncate max-w-2xl">{{ file.path }}</td>
                         <td class="px-6 py-3 text-right text-primary-400 font-semibold">{{ file.size }}</td>
                     </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" class="px-6 py-10 text-center text-gray-500 italic">No protected files found in latest run.</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-    {% else %}
-    <div class="bg-gray-800 rounded-xl border border-gray-700 p-12 text-center">
-        <p class="text-gray-500">No active Mover logs found to display detailed stats.</p>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
