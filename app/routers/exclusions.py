@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from app.core.config import get_user_settings, save_user_settings, ExclusionSettings
+from app.core.config import get_user_settings, save_user_settings
 from app.services.radarr import get_radarr_client
 from app.services.sonarr import get_sonarr_client
 from app.services.exclusions import get_exclusion_manager
@@ -58,28 +58,52 @@ async def exclusions_page(request: Request):
     return templates.TemplateResponse("exclusions.html", context)
 
 
-@router.post("/settings")
-async def save_exclusion_settings(
-    custom_folders: str = Form(""),
-    radarr_exclude_tag_ids: List[int] = Form([]),
-    sonarr_exclude_tag_ids: List[int] = Form([]),
-    plexcache_file_path: str = Form("/plexcache/unraid_mover_exclusions.txt"),
-    ca_mover_log_path: str = Form("/config/ca.mover.tuning")
-):
-    """Save all exclusion settings"""
-    # Parse custom folders
-    folder_list = [f.strip() for f in custom_folders.split('\n') if f.strip()]
-    
+@router.post("/radarr-tags")
+async def save_radarr_tags(radarr_exclude_tag_ids: List[int] = Form([])):
+    """Save Radarr tag exclusions"""
     user_settings = get_user_settings()
-    user_settings.exclusions = ExclusionSettings(
-        custom_folders=folder_list,
-        radarr_exclude_tag_ids=radarr_exclude_tag_ids,
-        sonarr_exclude_tag_ids=sonarr_exclude_tag_ids,
-        plexcache_file_path=plexcache_file_path,
-        ca_mover_log_path=ca_mover_log_path
-    )
-    
+    user_settings.exclusions.radarr_exclude_tag_ids = radarr_exclude_tag_ids
     save_user_settings(user_settings)
-    logger.info(f"Exclusion settings saved: {len(radarr_exclude_tag_ids)} Radarr tags, {len(sonarr_exclude_tag_ids)} Sonarr tags, {len(folder_list)} custom folders")
-    
+    logger.info(f"Radarr tags updated: {radarr_exclude_tag_ids}")
+    return RedirectResponse(url="/exclusions/?success=true", status_code=303)
+
+
+@router.post("/sonarr-tags")
+async def save_sonarr_tags(sonarr_exclude_tag_ids: List[int] = Form([])):
+    """Save Sonarr tag exclusions"""
+    user_settings = get_user_settings()
+    user_settings.exclusions.sonarr_exclude_tag_ids = sonarr_exclude_tag_ids
+    save_user_settings(user_settings)
+    logger.info(f"Sonarr tags updated: {sonarr_exclude_tag_ids}")
+    return RedirectResponse(url="/exclusions/?success=true", status_code=303)
+
+
+@router.post("/plexcache")
+async def save_plexcache(plexcache_file_path: str = Form(...)):
+    """Save PlexCache path"""
+    user_settings = get_user_settings()
+    user_settings.exclusions.plexcache_file_path = plexcache_file_path
+    save_user_settings(user_settings)
+    logger.info(f"PlexCache path updated: {plexcache_file_path}")
+    return RedirectResponse(url="/exclusions/?success=true", status_code=303)
+
+
+@router.post("/ca-mover")
+async def save_ca_mover(ca_mover_log_path: str = Form(...)):
+    """Save CA Mover log path"""
+    user_settings = get_user_settings()
+    user_settings.exclusions.ca_mover_log_path = ca_mover_log_path
+    save_user_settings(user_settings)
+    logger.info(f"CA Mover log path updated: {ca_mover_log_path}")
+    return RedirectResponse(url="/exclusions/?success=true", status_code=303)
+
+
+@router.post("/custom-folders")
+async def save_custom_folders(custom_folders: str = Form("")):
+    """Save custom folder exclusions"""
+    folder_list = [f.strip() for f in custom_folders.split('\n') if f.strip()]
+    user_settings = get_user_settings()
+    user_settings.exclusions.custom_folders = folder_list
+    save_user_settings(user_settings)
+    logger.info(f"Custom folders updated: {len(folder_list)} folders")
     return RedirectResponse(url="/exclusions/?success=true", status_code=303)
