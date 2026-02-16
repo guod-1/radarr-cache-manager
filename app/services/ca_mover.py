@@ -3,6 +3,7 @@ import glob
 import logging
 import shutil
 import datetime
+from app.core.config import get_user_settings
 
 logger = logging.getLogger(__name__)
 
@@ -11,12 +12,13 @@ class MoverLogParser:
         self.log_dir = log_dir
 
     def get_cache_usage(self):
-        """Calculates disk usage for the cache drive mount point"""
+        """Calculates disk usage for the configured cache drive mount point"""
         try:
-            # Targets the mount point /mnt/chloe from docker-compose
-            path = "/mnt/chloe"
+            settings = get_user_settings()
+            path = settings.exclusions.cache_mount_path
+            
             if not os.path.exists(path):
-                logger.error(f"Path {path} does not exist for usage check")
+                logger.error(f"Configured cache path {path} does not exist")
                 return {"total": 1, "used": 0, "free": 0, "percent": 0}
                 
             usage = shutil.disk_usage(path)
@@ -32,7 +34,6 @@ class MoverLogParser:
             return {"total": 1, "used": 0, "free": 0, "percent": 0}
 
     def get_latest_stats(self):
-        """Compatibility wrapper for standard stats parser"""
         try:
             list_of_files = glob.glob(f'{self.log_dir}/Filtered_files_*.list')
             if not list_of_files:
@@ -41,7 +42,6 @@ class MoverLogParser:
             
             latest_file = max(list_of_files, key=os.path.getctime)
             
-            # Identify most recent log that processed data (True Run)
             run_file = None
             for f in sorted(list_of_files, key=os.path.getctime, reverse=True):
                 if os.path.getsize(f) > 500:

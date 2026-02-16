@@ -17,16 +17,18 @@ async def settings_page(request: Request):
 
 @router.post("/paths/save")
 async def save_paths(
+    cache_mount_path: str = Form(...),
     movie_base_path: str = Form(...), 
     tv_base_path: str = Form(...),
     ca_mover_log_path: str = Form(...)
 ):
     settings = get_user_settings()
+    settings.exclusions.cache_mount_path = cache_mount_path
     settings.exclusions.movie_base_path = movie_base_path
     settings.exclusions.tv_base_path = tv_base_path
     settings.exclusions.ca_mover_log_path = ca_mover_log_path
     save_user_settings(settings)
-    logger.info(f"System paths updated. Movie: {movie_base_path}, TV: {tv_base_path}")
+    logger.info(f"System paths updated. Cache: {cache_mount_path}")
     return RedirectResponse(url="/settings?status=success", status_code=303)
 
 @router.post("/radarr/save")

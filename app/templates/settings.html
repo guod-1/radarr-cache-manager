@@ -33,16 +33,20 @@
         </div>
         <div class="p-6">
             <form action="/settings/paths/save" method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Cache Drive Mount Point</label>
+                    <input type="text" name="cache_mount_path" value="{{ settings.exclusions.cache_mount_path }}" placeholder="/mnt/chloe" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm">
+                    <p class="text-[10px] text-gray-500 mt-1">The root mount point of your cache drive (e.g. /mnt/chloe, /mnt/cache). Used for system stats.</p>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-400 mb-2">Movie Base Path (Host)</label>
-                        <input type="text" name="movie_base_path" value="{{ settings.exclusions.movie_base_path }}" placeholder="/mnt/cache/data/media/movies/" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm">
-                        <p class="text-[10px] text-gray-500 mt-1">Full path to movies on Unraid (e.g. /mnt/chloe/...)</p>
+                        <input type="text" name="movie_base_path" value="{{ settings.exclusions.movie_base_path }}" placeholder="/mnt/chloe/data/media/movies/" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-400 mb-2">TV Base Path (Host)</label>
-                        <input type="text" name="tv_base_path" value="{{ settings.exclusions.tv_base_path }}" placeholder="/mnt/cache/data/media/tv/" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm">
-                        <p class="text-[10px] text-gray-500 mt-1">Full path to tv shows on Unraid (e.g. /mnt/chloe/...)</p>
+                        <input type="text" name="tv_base_path" value="{{ settings.exclusions.tv_base_path }}" placeholder="/mnt/chloe/data/media/tv/" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm">
                     </div>
                 </div>
                 <div>

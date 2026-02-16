@@ -15,7 +15,8 @@ class ExclusionSettings(BaseModel):
     sonarr_exclude_tag_ids: List[int] = []
     plexcache_file_path: str = "/plexcache/unraid_mover_exclusions.txt"
     ca_mover_log_path: str = "/config/logs/mover.log"
-    # Configurable Paths with defaults
+    # Configurable Paths
+    cache_mount_path: str = "/mnt/cache"
     movie_base_path: str = "/mnt/cache/data/media/movies/"
     tv_base_path: str = "/mnt/cache/data/media/tv/"
     last_build: Optional[str] = None
@@ -38,7 +39,6 @@ def get_user_settings() -> UserSettings:
     if os.path.exists(CONFIG_PATH):
         try:
             with open(CONFIG_PATH, "r") as f:
-                # We use .parse_obj to ensure new fields (like movie_base_path) get defaults if missing in json
                 return UserSettings.parse_obj(json.load(f))
         except:
             return UserSettings()
