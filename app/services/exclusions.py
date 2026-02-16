@@ -65,7 +65,6 @@ class ExclusionManager:
                 f.write(f"{path}\n")
         
         # Update timestamp
-        settings.exclusions.last_build = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         save_user_settings(settings)
         
         logger.info(f"!!! COMPLETED !!! Total items: {len(final_list)}")
