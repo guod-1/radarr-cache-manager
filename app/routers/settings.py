@@ -16,12 +16,17 @@ async def settings_page(request: Request):
     return templates.TemplateResponse("settings.html", {"request": request, "settings": settings})
 
 @router.post("/paths/save")
-async def save_paths(movie_base_path: str = Form(...), tv_base_path: str = Form(...), ca_mover_log_path: str = Form(...)):
+async def save_paths(
+    movie_base_path: str = Form(...), 
+    tv_base_path: str = Form(...),
+    ca_mover_log_path: str = Form(...)
+):
     settings = get_user_settings()
     settings.exclusions.movie_base_path = movie_base_path
     settings.exclusions.tv_base_path = tv_base_path
     settings.exclusions.ca_mover_log_path = ca_mover_log_path
     save_user_settings(settings)
+    logger.info(f"System paths updated. Movie: {movie_base_path}, TV: {tv_base_path}")
     return RedirectResponse(url="/settings?status=success", status_code=303)
 
 @router.post("/radarr/save")
@@ -39,11 +44,3 @@ async def save_sonarr(url: str = Form(...), api_key: str = Form(...)):
     settings.sonarr.api_key = api_key
     save_user_settings(settings)
     return RedirectResponse(url="/settings?sonarr_status=success", status_code=303)
-
-@router.post("/automation/save")
-async def save_automation(scheduler_enabled: bool = Form(False), cron_expression: str = Form(...)):
-    settings = get_user_settings()
-    settings.scheduler.enabled = scheduler_enabled
-    settings.scheduler.cron_expression = cron_expression
-    save_user_settings(settings)
-    return RedirectResponse(url="/settings?automation_status=success", status_code=303)

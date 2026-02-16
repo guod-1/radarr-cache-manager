@@ -17,62 +17,71 @@ class ExclusionManager:
         clean = path.strip().strip('"').strip("'")
         settings = get_user_settings()
         
-        # Use configurable base paths from settings
+        # Check for movies keyword and replace with user-configured Movie Base Path
         if "/movies/" in clean.lower():
             idx = clean.lower().find("/movies/")
-            return f"{settings.exclusions.movie_base_path.rstrip('/')}/{clean[idx+8:].lstrip('/')}"
+            base = settings.exclusions.movie_base_path.rstrip('/')
+            sub_path = clean[idx+8:].lstrip('/')
+            return f"{base}/{sub_path}"
+            
+        # Check for tv keyword and replace with user-configured TV Base Path
         if "/tv/" in clean.lower():
             idx = clean.lower().find("/tv/")
-            return f"{settings.exclusions.tv_base_path.rstrip('/')}/{clean[idx+4:].lstrip('/')}"
+            base = settings.exclusions.tv_base_path.rstrip('/')
+            sub_path = clean[idx+4:].lstrip('/')
+            return f"{base}/{sub_path}"
+            
         return clean
 
-    def combine_exclusions(self) -> int:
-        logger.info("!!! STARTING EXCLUSION COMBINATION PROCESS !!!")
+    def build_exclusions(self):
+        logger.info("Building exclusions list...")
         all_paths = set()
         settings = get_user_settings()
 
+        # Custom folders
         for folder in settings.exclusions.custom_folders:
             all_paths.add(self._normalize_path(folder))
 
+        # PlexCache-D
         pc_path = Path(settings.exclusions.plexcache_file_path)
         if pc_path.exists():
             with open(pc_path, 'r') as f:
                 for line in f:
                     if line.strip() and not line.startswith('#'):
                         all_paths.add(self._normalize_path(line))
-            logger.info(f"Integrated lines from {pc_path}")
 
-        radarr_tags = set(settings.exclusions.radarr_exclude_tag_ids)
-        if radarr_tags:
+        # Radarr
+        if settings.exclusions.radarr_exclude_tag_ids:
             try:
                 movies = get_radarr_client().get_all_movies()
+                tag_ids = set(settings.exclusions.radarr_exclude_tag_ids)
                 for m in movies:
-                    if m.get('hasFile') and any(t in radarr_tags for t in m.get('tags', [])):
-                        all_paths.add(self._normalize_path(m['movieFile']['path']))
+                    if any(t in tag_ids for t in m.get('tags', [])):
+                        path = m.get('path') or (m.get('movieFile', {}).get('path'))
+                        if path:
+                            all_paths.add(self._normalize_path(path))
             except Exception as e:
-                logger.error(f"Error processing Radarr tags: {e}")
+                logger.error(f"Radarr exclusion build failed: {e}")
 
-        sonarr_tags = set(settings.exclusions.sonarr_exclude_tag_ids)
-        if sonarr_tags:
+        # Sonarr
+        if settings.exclusions.sonarr_exclude_tag_ids:
             try:
                 shows = get_sonarr_client().get_all_series()
+                tag_ids = set(settings.exclusions.sonarr_exclude_tag_ids)
                 for s in shows:
-                    if any(t in sonarr_tags for t in s.get('tags', [])):
-                        all_paths.add(self._normalize_path(s['path']))
+                    if any(t in tag_ids for t in s.get('tags', [])):
+                        if s.get('path'):
+                            all_paths.add(self._normalize_path(s['path']))
             except Exception as e:
-                logger.error(f"Error processing Sonarr tags: {e}")
+                logger.error(f"Sonarr exclusion build failed: {e}")
 
         final_list = sorted([p for p in all_paths if p])
-        os.makedirs(self.output_file.parent, exist_ok=True)
+        
         with open(self.output_file, 'w') as f:
             for path in final_list:
                 f.write(f"{path}\n")
         
-        settings.exclusions.last_build = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        save_user_settings(settings)
-        
-        logger.info(f"!!! COMPLETED !!! Total items: {len(final_list)}")
-        return len(final_list)
+        return {"total": len(final_list)}
 
     def get_exclusion_stats(self):
         if not self.output_file.exists(): return {"total_count": 0}
