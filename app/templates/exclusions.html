@@ -1,80 +1,106 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-8">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-white tracking-tight">Exclusion Management</h1>
-            <p class="text-gray-400 mt-1">Paths currently protected from the Unraid Mover</p>
+<div class="max-w-6xl mx-auto space-y-6">
+    <h1 class="text-3xl font-bold text-white tracking-tight">Exclusion Management</h1>
+
+    <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-lg">
+        <h3 class="text-lg font-semibold text-white mb-4">Radarr Tag Exclusions</h3>
+        <form action="/exclusions/radarr-tags/add" method="POST" class="space-y-4">
+            <label class="block text-sm font-medium text-gray-400 mb-1">Select Radarr Tag</label>
+            <div class="flex gap-2">
+                <select name="tag_id" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none focus:ring-1 focus:ring-primary-500">
+                    <option value="">-- Select a tag --</option>
+                    {% for tag in tags %}
+                    <option value="{{ tag.id }}">{{ tag.label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg font-bold transition">Add</button>
+            </div>
+        </form>
+        <div class="flex flex-wrap gap-2 mt-4">
+            {% for tag in tags %}
+                {% if tag.id in user_settings.exclusions.radarr_exclude_tag_ids %}
+                <form action="/exclusions/radarr-tags/remove" method="POST" class="inline">
+                    <input type="hidden" name="tag_id" value="{{ tag.id }}">
+                    <button type="submit" class="bg-primary-900/40 text-primary-400 border border-primary-800/50 px-3 py-1 rounded-full text-xs flex items-center hover:bg-red-900/40 hover:text-red-400 transition">
+                        {{ tag.label }} <i class="fa-solid fa-xmark ml-2"></i>
+                    </button>
+                </form>
+                {% endif %}
+            {% endfor %}
         </div>
-        <div id="op-result-excl">
-            <button hx-post="/operations/run/exclusions" 
-                    hx-target="#op-result-excl" 
-                    class="bg-primary-600 hover:bg-primary-500 text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center shadow-lg">
-                <i class="fa-solid fa-hammer mr-2"></i> Build Exclusions
-            </button>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-lg">
+        <h3 class="text-lg font-semibold text-white mb-4">Sonarr Tag Exclusions</h3>
+        <form action="/exclusions/sonarr-tags/add" method="POST" class="space-y-4">
+            <label class="block text-sm font-medium text-gray-400 mb-1">Select Sonarr Tag</label>
+            <div class="flex gap-2">
+                <select name="tag_id" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none focus:ring-1 focus:ring-primary-500">
+                    <option value="">-- Select a tag --</option>
+                    {% for tag in sonarr_tags %}
+                    <option value="{{ tag.id }}">{{ tag.label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg font-bold transition">Add</button>
+            </div>
+        </form>
+        <div class="flex flex-wrap gap-2 mt-4">
+            {% for tag in sonarr_tags %}
+                {% if tag.id in user_settings.exclusions.sonarr_exclude_tag_ids %}
+                <form action="/exclusions/sonarr-tags/remove" method="POST" class="inline">
+                    <input type="hidden" name="tag_id" value="{{ tag.id }}">
+                    <button type="submit" class="bg-primary-900/40 text-primary-400 border border-primary-800/50 px-3 py-1 rounded-full text-xs flex items-center hover:bg-red-900/40 hover:text-red-400 transition">
+                        {{ tag.label }} <i class="fa-solid fa-xmark ml-2"></i>
+                    </button>
+                </form>
+                {% endif %}
+            {% endfor %}
         </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-lg">
+        <h3 class="text-lg font-semibold text-white mb-4">PlexCache-D Integration</h3>
+        <form action="/exclusions/plexcache" method="POST" class="space-y-4">
+            <input type="text" name="plexcache_file_path" value="{{ user_settings.exclusions.plexcache_file_path }}" 
+                   class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm outline-none focus:ring-1 focus:ring-primary-500">
+            <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg font-bold transition shadow-lg shadow-primary-950/20">Save Path</button>
+        </form>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-lg">
+        <h3 class="text-lg font-semibold text-white mb-4">Custom Folders</h3>
+        <form action="/exclusions/custom-folders" method="POST" class="space-y-4">
+            <textarea name="custom_folders" rows="6" 
+                      class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm outline-none focus:ring-1 focus:ring-primary-500">{% for folder in user_settings.exclusions.custom_folders %}{{ folder }}{{ "\n" if not loop.last }}{% endfor %}</textarea>
+            <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg font-bold transition shadow-lg shadow-primary-950/20">Save Folders</button>
+        </form>
     </div>
 
     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-2xl overflow-hidden">
         <div class="px-6 py-4 bg-gray-850 border-b border-gray-700 flex justify-between items-center">
             <h2 class="text-lg font-semibold text-white">Current Exclusion File</h2>
-            <span class="text-[10px] text-gray-500 bg-gray-900 px-2 py-1 rounded font-bold uppercase">{{ current_exclusions|length }} Items Found</span>
+            <span class="text-xs text-gray-500">{{ exclusions|length }} items</span>
         </div>
-        <div class="max-h-[400px] overflow-y-auto">
+        <div class="max-h-[500px] overflow-y-auto">
             <table class="min-w-full divide-y divide-gray-800 bg-gray-900">
-                <thead class="sticky top-0 bg-gray-950 shadow-md z-10">
+                <thead class="sticky top-0 bg-gray-950 shadow-md">
                     <tr class="text-left text-[11px] text-gray-500 uppercase font-bold">
-                        <th class="px-6 py-4">Excluded Path / Folder Pattern</th>
+                        <th class="px-6 py-4">Excluded Path</th>
                         <th class="px-6 py-4 text-right">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-800">
-                    {% for path in current_exclusions %}
-                    <tr class="hover:bg-gray-800/40 transition-colors group">
-                        <td class="px-6 py-3 text-xs text-gray-400 group-hover:text-gray-200 font-mono truncate max-w-4xl">{{ path }}</td>
+                    {% for item in exclusions %}
+                    <tr class="hover:bg-gray-800/40 transition-colors">
+                        <td class="px-6 py-3 text-[11px] text-gray-400 font-mono truncate">{{ item }}</td>
                         <td class="px-6 py-3 text-right">
-                            <span class="text-[10px] font-bold text-primary-500 bg-primary-950/30 px-2 py-1 rounded border border-primary-900/50">PROTECTED</span>
+                            <span class="text-[9px] font-bold text-primary-500 bg-primary-950/30 px-2 py-1 rounded border border-primary-900/50">PROTECTED</span>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
-            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center">
-                <i class="fa-solid fa-film mr-2 text-primary-500"></i> Radarr Tags
-            </h3>
-            <form hx-post="/exclusions/tags/radarr" hx-target="#op-result-excl" class="space-y-4">
-                <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 bg-gray-900 rounded border border-gray-700">
-                    {% for tag in radarr_tags %}
-                    <label class="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer hover:text-white">
-                        <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id in selected_radarr %}checked{% endif %} class="rounded border-gray-600 bg-gray-800 text-primary-600">
-                        <span>{{ tag.label }}</span>
-                    </label>
-                    {% endfor %}
-                </div>
-                <button type="submit" class="w-full bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 rounded transition">Update Radarr Tags</button>
-            </form>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
-            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center">
-                <i class="fa-solid fa-tv mr-2 text-primary-500"></i> Sonarr Tags
-            </h3>
-            <form hx-post="/exclusions/tags/sonarr" hx-target="#op-result-excl" class="space-y-4">
-                <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 bg-gray-900 rounded border border-gray-700">
-                    {% for tag in sonarr_tags %}
-                    <label class="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer hover:text-white">
-                        <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id in selected_sonarr %}checked{% endif %} class="rounded border-gray-600 bg-gray-800 text-primary-600">
-                        <span>{{ tag.label }}</span>
-                    </label>
-                    {% endfor %}
-                </div>
-                <button type="submit" class="w-full bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 rounded transition">Update Sonarr Tags</button>
-            </form>
         </div>
     </div>
 </div>
