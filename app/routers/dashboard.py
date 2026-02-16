@@ -5,7 +5,6 @@ from app.services.ca_mover import get_mover_parser
 from app.services.exclusions import get_exclusion_manager
 import datetime
 import logging
-import asyncio
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -16,25 +15,23 @@ async def dashboard_page(request: Request):
     mover_parser = get_mover_parser()
     exclusion_manager = get_exclusion_manager()
     
-    # Fast paths for usage and local stats
+    stats = mover_parser.get_latest_stats()
     cache_usage = mover_parser.get_cache_usage()
     exclusion_stats = exclusion_manager.get_exclusion_stats()
-    stats = mover_parser.get_latest_stats()
-
-    # We use a default 'Online' for now to keep the UI fast, 
-    # real checks happen in the background or on specific setting tests.
+    
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "stats": stats,
         "cache_usage": cache_usage,
         "exclusion_count": exclusion_stats.get("total_count", 0),
-        "radarr_online": True, 
+        "radarr_online": True, # Optimized out of main load
         "sonarr_online": True,
         "check_time": datetime.datetime.now().strftime("%H:%M:%S")
     })
 
 @router.get("/stats/refresh", response_class=HTMLResponse)
 async def refresh_stats(request: Request):
+    logger.info("Manual Mover Log check triggered via Dashboard.")
     mover_parser = get_mover_parser()
     stats = mover_parser.get_latest_stats()
     return templates.TemplateResponse("partials/mover_stats_card.html", {

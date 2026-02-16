@@ -5,36 +5,38 @@
         </h2>
         <div class="flex items-center space-x-3">
             {% if check_time %}
-            <span class="text-[10px] text-gray-500 font-mono">Refreshed: {{ check_time }}</span>
+            <span class="text-[10px] text-gray-500 font-mono">Last Checked: {{ check_time }}</span>
             {% endif %}
             <button hx-get="/dashboard/stats/refresh" 
                     hx-target="#mover-stats-card" 
                     hx-swap="outerHTML"
-                    hx-indicator="#refresh-spinner"
-                    class="text-gray-400 hover:text-white transition-colors">
-                <i id="refresh-spinner" class="fa-solid fa-rotate htmx-indicator"></i>
+                    hx-indicator="#stats-spinner"
+                    class="flex items-center bg-gray-700 hover:bg-gray-600 text-white text-xs py-1.5 px-3 rounded-md transition border border-gray-600">
+                <i id="stats-spinner" class="fa-solid fa-arrows-rotate mr-2 htmx-indicator"></i>
+                Check Latest Log
             </button>
         </div>
     </div>
     <div class="p-6">
         {% if stats %}
             <div class="grid grid-cols-2 gap-4">
-                <div class="text-center p-4 bg-gray-900 rounded-lg">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Protected</p>
+                <div class="text-center p-4 bg-gray-900 rounded-lg border border-gray-800">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Protected</p>
                     <p class="text-2xl font-bold text-primary-400">{{ stats.excluded }}</p>
                 </div>
-                <div class="text-center p-4 bg-gray-900 rounded-lg">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Moved</p>
+                <div class="text-center p-4 bg-gray-900 rounded-lg border border-gray-800">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Moved</p>
                     <p class="text-2xl font-bold text-orange-400">{{ stats.moved }}</p>
                 </div>
             </div>
             <div class="mt-4 flex items-center justify-between text-[10px] text-gray-500">
-                <span class="truncate italic">File: {{ stats.filename }}</span>
+                <span class="truncate italic"><i class="fa-solid fa-file-invoice mr-1"></i> {{ stats.filename }}</span>
+                <span class="text-primary-500 font-bold uppercase">{{ "True Run" if stats.is_run else "Idle Check" }}</span>
             </div>
         {% else %}
-            <div class="py-8 text-center">
-                <i class="fa-solid fa-file-circle-exclamation text-gray-600 text-3xl mb-2"></i>
-                <p class="text-sm text-gray-500 italic">No logs found in /mover_logs</p>
+            <div class="py-6 text-center">
+                <i class="fa-solid fa-magnifying-glass text-gray-700 text-3xl mb-2"></i>
+                <p class="text-sm text-gray-500 italic">No activity logs found in /mover_logs</p>
             </div>
         {% endif %}
     </div>
