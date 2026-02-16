@@ -24,7 +24,7 @@ async def dashboard(request: Request):
     mover = get_mover_parser()
     excl = get_exclusion_manager()
     
-    mover_stats = mover.get_stats_for_file()
+    mover_stats = mover.get_latest_stats()
     disk_usage = mover.get_cache_usage()
     excl_stats = excl.get_exclusion_stats()
     

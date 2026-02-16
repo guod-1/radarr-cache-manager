@@ -1,8 +1,8 @@
 import os
 import glob
 import logging
-import datetime
 import shutil
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -10,15 +10,12 @@ class MoverLogParser:
     def __init__(self, log_dir="/mover_logs"):
         self.log_dir = log_dir
 
-    def get_latest_stats(self):
-        return self.get_stats_for_file()
-
     def get_cache_usage(self):
         """Calculates disk usage for the cache drive mount point"""
         try:
-            # Assumes /mnt/chloe is the cache mount point based on your setup
+            # Assumes /mnt/chloe is the cache mount point
             total, used, free = shutil.disk_usage("/mnt/chloe")
-            percent = (used / total) * 100
+            percent = (used / total) * 100 if total > 0 else 0
             return {
                 "total": total,
                 "used": used,
@@ -27,9 +24,10 @@ class MoverLogParser:
             }
         except Exception as e:
             logger.error(f"Failed to get cache usage: {e}")
-            return {"total": 0, "used": 0, "free": 0, "percent": 0}
+            return {"total": 1, "used": 0, "free": 0, "percent": 0}
 
-    def get_stats_for_file(self, filename=None):
+    def get_latest_stats(self):
+        """Standard stats parser for the most recent log file"""
         try:
             list_of_files = glob.glob(f'{self.log_dir}/Filtered_files_*.list')
             if not list_of_files:
@@ -38,24 +36,24 @@ class MoverLogParser:
             
             latest_file = max(list_of_files, key=os.path.getctime)
             
+            # Identify the most recent log that actually processed files (True Run)
             run_file = None
             for f in sorted(list_of_files, key=os.path.getctime, reverse=True):
                 if os.path.getsize(f) > 500:
                     run_file = f
                     break
             
-            target_file = filename if filename else latest_file
             stats = {
-                "filename": os.path.basename(target_file),
-                "is_run": os.path.getsize(target_file) > 500,
+                "filename": os.path.basename(latest_file),
+                "is_run": os.path.getsize(latest_file) > 500,
                 "excluded": 0,
                 "moved": 0,
                 "total_bytes_kept": 0,
-                "timestamp": os.path.getmtime(target_file),
+                "timestamp": os.path.getmtime(latest_file),
                 "last_run_timestamp": os.path.getmtime(run_file) if run_file else None
             }
 
-            with open(target_file, 'r') as f:
+            with open(latest_file, 'r') as f:
                 for line in f:
                     if "|" in line:
                         parts = line.strip().split("|")
