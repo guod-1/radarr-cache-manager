@@ -1,7 +1,7 @@
 <div id="mover-stats-card" class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
         <h2 class="text-lg font-semibold text-white">
-            <i class="fa-solid fa-chart-line mr-2 {{ "text-green-400" if stats.is_run else "text-gray-500" }}"></i> Mover Efficiency
+            <i class="fa-solid fa-chart-line mr-2 text-primary-500"></i> Mover Efficiency
         </h2>
         <div class="flex items-center space-x-3">
             {% if check_time %}
@@ -16,9 +16,10 @@
             </button>
         </div>
     </div>
+
     <div class="p-6">
         {% if stats %}
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="text-center p-4 bg-gray-900 rounded-lg border border-gray-800">
                     <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Protected</p>
                     <p class="text-2xl font-bold text-primary-400">{{ stats.excluded }}</p>
@@ -28,13 +29,41 @@
                     <p class="text-2xl font-bold text-orange-400">{{ stats.moved }}</p>
                 </div>
             </div>
-            <div class="mt-4 flex items-center justify-between text-[10px] text-gray-500">
+
+            <div class="mt-4">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Files Currently Protected on Cache</h3>
+                <div class="overflow-x-auto rounded-lg border border-gray-700">
+                    <table class="min-w-full divide-y divide-gray-700 bg-gray-900">
+                        <thead>
+                            <tr class="text-left text-[10px] text-gray-500 uppercase font-bold">
+                                <th class="px-4 py-2">File Path / Folder</th>
+                                <th class="px-4 py-2 text-right">Size (est)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800">
+                            {% for file in stats.protected_files %}
+                            <tr class="text-[11px] hover:bg-gray-800/50">
+                                <td class="px-4 py-2 text-gray-300 truncate max-w-md">{{ file.path }}</td>
+                                <td class="px-4 py-2 text-right text-gray-500 font-mono">{{ file.size }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="2" class="px-4 py-6 text-center text-gray-500 italic">No files protected in this log run.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between text-[10px] text-gray-500 border-t border-gray-700 pt-3">
                 <span class="truncate italic"><i class="fa-solid fa-file-invoice mr-1"></i> {{ stats.filename }}</span>
-                <span class="{{ "text-green-400" if stats.is_run else "text-gray-500" }} font-bold uppercase">{{ stats.type_label }}</span>
+                <span class="{{ 'text-green-400' if stats.is_run else 'text-gray-500' }} font-bold uppercase">{{ stats.type_label }}</span>
             </div>
         {% else %}
-            <div class="py-6 text-center">
-                <p class="text-sm text-gray-500 italic">No activity logs found</p>
+            <div class="py-12 text-center">
+                <i class="fa-solid fa-magnifying-glass text-gray-700 text-4xl mb-3"></i>
+                <p class="text-sm text-gray-500 italic">No activity logs found in /mover_logs</p>
             </div>
         {% endif %}
     </div>
