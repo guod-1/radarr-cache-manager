@@ -17,7 +17,8 @@ class ExclusionSettings(BaseModel):
     radarr_exclude_tag_ids: List[int] = []
     sonarr_exclude_tag_ids: List[int] = []
     plexcache_file_path: str = "/plexcache/unraid_mover_exclusions.txt"
-    ca_mover_log_path: str = "/mover_logs"
+    # UPDATED: Default to local logs folder
+    ca_mover_log_path: str = "/config/logs/mover.log"
     last_build: Optional[str] = None
 
 class RadarrSettings(BaseModel):
