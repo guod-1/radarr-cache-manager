@@ -1,7 +1,7 @@
 import os
 import glob
 import logging
-import datetime
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -10,10 +10,19 @@ class MoverLogParser:
         self.log_dir = log_dir
 
     def get_latest_stats(self):
-        """Compatibility wrapper for the new stats engine"""
+        """Compatibility wrapper for dashboard router calling get_latest_stats"""
         return self.get_stats_for_file()
 
+    def get_all_runs(self):
+        """Returns a list of all available mover logs for history picking"""
+        try:
+            files = glob.glob(f'{self.log_dir}/Filtered_files_*.list')
+            return sorted([os.path.basename(f) for f in files], reverse=True)
+        except Exception:
+            return []
+
     def get_stats_for_file(self, filename=None):
+        """Parses a specific log file or the latest one available"""
         try:
             if not filename:
                 list_of_files = glob.glob(f'{self.log_dir}/Filtered_files_*.list')
@@ -52,6 +61,7 @@ class MoverLogParser:
             total = stats["excluded"] + stats["moved"]
             if total > 0:
                 stats["efficiency"] = round((stats["excluded"] / total) * 100, 1)
+                
             return stats
         except Exception as e:
             logger.error(f"Failed to parse mover logs: {e}")
