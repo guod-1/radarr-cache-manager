@@ -6,6 +6,7 @@ from app.services.radarr import get_radarr_client
 from app.services.sonarr import get_sonarr_client
 import os
 import logging
+from typing import List
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
