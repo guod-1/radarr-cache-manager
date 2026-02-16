@@ -38,19 +38,24 @@ class ExclusionManager:
         all_paths = set()
         settings = get_user_settings()
 
-        # Custom folders
+        # 1. Gather Custom folders
         for folder in settings.exclusions.custom_folders:
-            all_paths.add(self._normalize_path(folder))
+            normalized = self._normalize_path(folder)
+            if normalized:
+                all_paths.add(normalized)
 
-        # PlexCache-D
+        # 2. Gather PlexCache-D paths
         pc_path = Path(settings.exclusions.plexcache_file_path)
         if pc_path.exists():
-            with open(pc_path, 'r') as f:
-                for line in f:
-                    if line.strip() and not line.startswith('#'):
-                        all_paths.add(self._normalize_path(line))
+            try:
+                with open(pc_path, 'r') as f:
+                    for line in f:
+                        if line.strip() and not line.startswith('#'):
+                            all_paths.add(self._normalize_path(line))
+            except Exception as e:
+                logger.error(f"Error reading PlexCache file: {e}")
 
-        # Radarr
+        # 3. Gather Radarr paths
         if settings.exclusions.radarr_exclude_tag_ids:
             try:
                 movies = get_radarr_client().get_all_movies()
@@ -63,7 +68,7 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Radarr exclusion build failed: {e}")
 
-        # Sonarr
+        # 4. Gather Sonarr paths
         if settings.exclusions.sonarr_exclude_tag_ids:
             try:
                 shows = get_sonarr_client().get_all_series()
@@ -75,13 +80,35 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Sonarr exclusion build failed: {e}")
 
-        final_list = sorted([p for p in all_paths if p])
+        # 5. VALIDATION: Only keep files that exist on the specific cache path
+        valid_paths = []
+        for p in all_paths:
+            # We assume the container has the cache path mounted correctly
+            # (e.g., /mnt/chloe inside container matches /mnt/chloe on host)
+            if os.path.exists(p):
+                valid_paths.append(p)
+            else:
+                # This file is either missing, not downloaded, or already moved to array
+                # logger.debug(f"Skipping non-existent cache path: {p}")
+                pass
+
+        final_list = sorted(valid_paths)
         
-        with open(self.output_file, 'w') as f:
-            for path in final_list:
-                f.write(f"{path}\n")
-        
-        return {"total": len(final_list)}
+        try:
+            with open(self.output_file, 'w') as f:
+                for path in final_list:
+                    f.write(f"{path}\n")
+            
+            # Update last build time
+            settings.exclusions.last_build = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            save_user_settings(settings)
+            
+            logger.info(f"Exclusions built. Candidates: {len(all_paths)}, Validated (Existing): {len(final_list)}")
+            return {"total": len(final_list), "candidates": len(all_paths)}
+            
+        except Exception as e:
+            logger.error(f"Failed to write exclusion file: {e}")
+            raise e
 
     def get_exclusion_stats(self):
         if not self.output_file.exists(): return {"total_count": 0}
