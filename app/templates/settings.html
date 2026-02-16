@@ -3,50 +3,31 @@
 <div class="max-w-5xl mx-auto space-y-8 pb-12">
     <div>
         <h1 class="text-3xl font-bold text-white tracking-tight">System Configuration</h1>
-        <p class="text-gray-400 mt-1">Configure your service connections and Unraid system paths</p>
+        <p class="text-gray-400 mt-1">Configure your service connections, paths, and automation schedules</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
-                <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-film mr-2 text-primary-500"></i> Radarr</h2>
-                {% if request.query_params.get('radarr_status') == 'success' %}
-                    <span class="text-green-400 text-[10px] font-bold uppercase tracking-widest bg-green-900/30 px-2 py-1 rounded border border-green-800/50">Connected</span>
-                {% endif %}
+            <div class="px-6 py-4 border-b border-gray-700 bg-gray-850">
+                <h2 class="text-lg font-semibold text-white">Radarr</h2>
             </div>
             <div class="p-6">
                 <form action="/settings/radarr/save" method="POST" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Host URL</label>
-                        <input type="text" name="url" value="{{ settings.radarr.url }}" placeholder="http://192.168.1.5:7878" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none focus:ring-1 focus:ring-primary-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">API Key</label>
-                        <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none focus:ring-1 focus:ring-primary-500">
-                    </div>
-                    <button type="submit" class="w-full bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 rounded-lg transition">Save & Test</button>
+                    <input type="text" name="url" value="{{ settings.radarr.url }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
+                    <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
+                    <button type="submit" class="w-full bg-primary-600 py-2 rounded-lg text-white">Save Radarr</button>
                 </form>
             </div>
         </div>
-
         <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
-                <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-tv mr-2 text-primary-500"></i> Sonarr</h2>
-                {% if request.query_params.get('sonarr_status') == 'success' %}
-                    <span class="text-green-400 text-[10px] font-bold uppercase tracking-widest bg-green-900/30 px-2 py-1 rounded border border-green-800/50">Connected</span>
-                {% endif %}
+            <div class="px-6 py-4 border-b border-gray-700 bg-gray-850">
+                <h2 class="text-lg font-semibold text-white">Sonarr</h2>
             </div>
             <div class="p-6">
                 <form action="/settings/sonarr/save" method="POST" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Host URL</label>
-                        <input type="text" name="url" value="{{ settings.sonarr.url }}" placeholder="http://192.168.1.5:8989" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none focus:ring-1 focus:ring-primary-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">API Key</label>
-                        <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none focus:ring-1 focus:ring-primary-500">
-                    </div>
-                    <button type="submit" class="w-full bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 rounded-lg transition">Save & Test</button>
+                    <input type="text" name="url" value="{{ settings.sonarr.url }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
+                    <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
+                    <button type="submit" class="w-full bg-primary-600 py-2 rounded-lg text-white">Save Sonarr</button>
                 </form>
             </div>
         </div>
@@ -54,35 +35,36 @@
 
     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-700 bg-gray-850">
-            <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-folder-tree mr-2 text-primary-500"></i> System Paths</h2>
+            <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-clock mr-2 text-primary-500"></i> Paths & Automation</h2>
         </div>
         <div class="p-6">
             <form action="/settings/paths/save" method="POST" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Full Sync Schedule (Cron)</label>
+                        <input type="text" name="full_sync_cron" value="{{ settings.exclusions.full_sync_cron|default('0 * * * *') }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
+                        <p class="text-[10px] text-gray-500 mt-1 italic">Example: "0 * * * *" is every hour. "30 3 * * *" is 3:30 AM daily.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Log Monitor Interval (Seconds)</label>
+                        <input type="number" name="log_monitor_interval" value="{{ settings.exclusions.log_monitor_interval|default(300) }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
+                        <p class="text-[10px] text-gray-500 mt-1 italic">How often to refresh the Dashboard stats (default: 300s / 5m).</p>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-700 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cache Mount Point</label>
-                        <input type="text" name="cache_mount_path" value="{{ settings.exclusions.cache_mount_path }}" placeholder="/mnt/chloe" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Used to calculate cache usage %</p>
+                        <input type="text" name="cache_mount_path" value="{{ settings.exclusions.cache_mount_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mover Tuning Log Path</label>
                         <input type="text" name="ca_mover_log_path" value="{{ settings.exclusions.ca_mover_log_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Path to CA Mover logs (e.g. /boot/logs/mover_logs)</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Movie Base Path (Host)</label>
-                        <input type="text" name="movie_base_path" value="{{ settings.exclusions.movie_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">TV Base Path (Host)</label>
-                        <input type="text" name="tv_base_path" value="{{ settings.exclusions.tv_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
-                    </div>
-                </div>
                 <div class="flex justify-end pt-4">
-                    <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 px-8 rounded-lg transition shadow-lg shadow-primary-950/20">Save System Paths</button>
+                    <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 px-8 rounded-lg transition shadow-lg shadow-primary-950/20">Save All System Settings</button>
                 </div>
             </form>
         </div>

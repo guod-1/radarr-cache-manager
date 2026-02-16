@@ -20,13 +20,17 @@ async def save_paths(
     cache_mount_path: str = Form(...),
     movie_base_path: str = Form(...), 
     tv_base_path: str = Form(...),
-    ca_mover_log_path: str = Form(...)
+    ca_mover_log_path: str = Form(...),
+    full_sync_cron: str = Form("0 * * * *"),
+    log_monitor_interval: int = Form(300)
 ):
     settings = get_user_settings()
     settings.exclusions.cache_mount_path = cache_mount_path
     settings.exclusions.movie_base_path = movie_base_path
     settings.exclusions.tv_base_path = tv_base_path
     settings.exclusions.ca_mover_log_path = ca_mover_log_path
+    settings.exclusions.full_sync_cron = full_sync_cron
+    settings.exclusions.log_monitor_interval = log_monitor_interval
     save_user_settings(settings)
     logger.info(f"System paths updated. Cache: {cache_mount_path}")
     return RedirectResponse(url="/settings?status=success", status_code=303)
