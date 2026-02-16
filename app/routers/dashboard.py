@@ -21,16 +21,16 @@ async def dashboard_page(request: Request):
         "request": request,
         "stats": stats,
         "cache_usage": cache_usage,
-        "exclusion_count": exclusion_stats.get("total_count", 0)
+        "exclusion_count": exclusion_stats.get("total_count", 0),
+        "check_time": datetime.datetime.now().strftime("%H:%M:%S")
     })
 
 @router.get("/stats/refresh", response_class=HTMLResponse)
 async def refresh_stats(request: Request):
     mover_parser = get_mover_parser()
     stats = mover_parser.get_latest_stats()
-    check_time = datetime.datetime.now().strftime("%H:%M:%S")
     return templates.TemplateResponse("partials/mover_stats_card.html", {
         "request": request, 
         "stats": stats, 
-        "check_time": check_time
+        "check_time": datetime.datetime.now().strftime("%H:%M:%S")
     })
