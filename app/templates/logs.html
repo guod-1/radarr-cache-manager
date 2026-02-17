@@ -22,53 +22,25 @@
                 <span class="ml-4 text-[10px] font-mono text-gray-500 uppercase tracking-widest">/config/app.log</span>
             </div>
             <div class="flex items-center gap-4">
-                <label class="flex items-center cursor-pointer">
-                    <span class="mr-2 text-[10px] text-gray-500 font-bold uppercase">Auto-Refresh</span>
-                    <input type="checkbox" id="autoRefreshToggle" class="sr-only peer">
-                    <div class="w-7 h-4 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-primary-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-                </label>
                 <button hx-get="/logs/refresh" hx-target="#log-console" class="text-primary-500 hover:text-primary-400 text-xs font-bold uppercase">
-                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh
                 </button>
             </div>
         </div>
 
         <pre id="log-console" 
-             hx-get="/logs/refresh" 
-             hx-trigger="every 5s" 
-             hx-request="unset"
-             class="flex-1 p-6 text-xs font-mono overflow-y-auto whitespace-pre-wrap leading-relaxed text-gray-300">
-            {{ log_content }}
-        </pre>
+             class="flex-1 p-6 text-xs font-mono overflow-y-auto whitespace-pre-wrap leading-relaxed text-gray-300">{% if log_content %}{{ log_content }}{% else %}No log data available.{% endif %}</pre>
     </div>
 </div>
 
-<style>
-    #log-console { scroll-behavior: smooth; }
-    /* Highlight INFO, WARNING, ERROR */
-    #log-console:contains("INFO") { color: #94a3b8; }
-    /* Note: Dynamic highlighting is better done via JS if complex, but simple CSS helps */
-</style>
-
 <script>
-    // Scroll to bottom on load
     const consoleBox = document.getElementById('log-console');
-    consoleBox.scrollTop = consoleBox.scrollHeight;
-
-    // Toggle HTMX polling based on checkbox
-    document.getElementById('autoRefreshToggle').addEventListener('change', function() {
-        if(this.checked) {
-            consoleBox.setAttribute('hx-trigger', 'every 5s');
-            htmx.process(consoleBox);
-        } else {
-            consoleBox.setAttribute('hx-trigger', 'none');
-        }
-    });
-
-    // Auto-scroll on content update
+    if (consoleBox) { consoleBox.scrollTop = consoleBox.scrollHeight; }
+    
     document.body.addEventListener('htmx:afterSwap', function(evt) {
         if (evt.detail.target.id === 'log-console') {
             consoleBox.scrollTop = consoleBox.scrollHeight;
         }
     });
 </script>
+{% endblock %}

@@ -15,7 +15,7 @@ def get_log_data():
         except: return "Error reading logs."
     return "Log file not found."
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("", response_class=HTMLResponse)
 async def logs_page(request: Request):
     return templates.TemplateResponse("logs.html", {
         "request": request,
