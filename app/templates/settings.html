@@ -44,9 +44,9 @@
             <form action="/settings/paths/save" method="POST" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Full Sync Schedule (Cron)</label>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Exclusion Builder Scheduler (Cron)</label>
                         <input type="text" name="full_sync_cron" value="{{ settings.exclusions.full_sync_cron }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Example: "0 * * * *" is every hour. "30 3 * * *" is 3:30 AM daily.</p>
+                        <p class="text-[10px] text-gray-500 mt-1 italic">This triggers the scan of Radarr/Sonarr and rebuilds the exclusion file.</p>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Log Monitor Schedule (Cron)</label>
