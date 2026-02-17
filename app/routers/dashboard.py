@@ -13,8 +13,10 @@ templates = Jinja2Templates(directory="app/templates")
 def check_service(url, api_key):
     if not url or not api_key: return False
     try:
+        # Simple timeout check to see if service is up
         target = f"{url.rstrip('/')}/api/v3/system/status?apiKey={api_key}"
-        with urllib.request.urlopen(target, timeout=2) as response:
+        request = urllib.request.Request(target, method='HEAD')
+        with urllib.request.urlopen(request, timeout=2) as response:
             return response.status == 200
     except:
         return False
@@ -22,8 +24,16 @@ def check_service(url, api_key):
 @router.get("/", response_class=HTMLResponse)
 async def dashboard_page(request: Request):
     settings = get_user_settings()
-    stats = get_mover_parser().get_latest_stats()
+    parser = get_mover_parser()
     
+    # FORCE REFRESH: Parse the log file right now!
+    # This ensures we don't show "0" just because the cron hasn't run yet.
+    try:
+        stats = parser.parse_log()
+    except Exception:
+        # If parsing fails (e.g. file locked/missing), return empty zeros
+        stats = {"movie_count": 0, "tv_count": 0, "total_size": "0 GB"}
+
     # Check Service Health
     radarr_up = check_service(settings.radarr.url, settings.radarr.api_key)
     sonarr_up = check_service(settings.sonarr.url, settings.sonarr.api_key)
