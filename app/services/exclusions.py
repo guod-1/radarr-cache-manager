@@ -8,12 +8,13 @@ from app.services.sonarr import get_sonarr_client
 
 logger = logging.getLogger(__name__)
 
-CONTAINER_CACHE_PATH = "/mnt/cache"
-HOST_CACHE_PATH = "/mnt/chloe"
+# paths come from settings now
+# paths come from settings now
 
 def to_container_path(host_path: str) -> str:
     """Translate host path to container path for existence check"""
-    return host_path.replace(HOST_CACHE_PATH, CONTAINER_CACHE_PATH)
+    settings = get_user_settings()
+    return host_path.replace(settings.exclusions.host_cache_path, settings.exclusions.cache_mount_path)
 
 class ExclusionManager:
     def __init__(self):

@@ -24,6 +24,7 @@ class ExclusionSettings(BaseModel):
     plexcache_file_path: str = "/plexcache/unraid_mover_exclusions.txt"
     ca_mover_log_path: str = "/mover_logs/ca.mover.tuning.log"
     cache_mount_path: str = "/mnt/cache"
+    host_cache_path: str = "/mnt/chloe"
     movie_base_path: str = "/mnt/cache/data/media/movies/"
     tv_base_path: str = "/mnt/cache/data/media/tv/"
     last_build: Optional[str] = None
