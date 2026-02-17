@@ -2,26 +2,31 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Movies</h1>
-    
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-white">Movies <span class="text-lg font-normal text-gray-400">({{ total }})</span></h1>
+        <input type="text" id="movieSearch" onkeyup="filterTable('movieSearch', 'moviesTable')"
+               placeholder="Search movies..."
+               class="bg-gray-900 border border-gray-700 text-gray-300 text-sm rounded-lg px-4 py-2 w-72 focus:ring-1 focus:ring-teal-500 outline-none">
+    </div>
+
+    <div class="bg-gray-800 shadow rounded-lg overflow-hidden">
+        <table id="moviesTable" class="min-w-full divide-y divide-gray-700">
+            <thead class="bg-gray-900">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Year</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tags</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
                 </tr>
             </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="bg-gray-800 divide-y divide-gray-700">
                 {% for movie in movies %}
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ movie.title }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ movie.year }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ movie.title }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ movie.year }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-400">
                         <div class="flex flex-wrap gap-1">
                             {% for tag in movie.tags %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-900 text-teal-200">
                                 {{ tag }}
                             </span>
                             {% endfor %}
@@ -31,12 +36,25 @@
                 {% endfor %}
             </tbody>
         </table>
-        
         {% if not movies %}
         <div class="text-center py-12">
-            <p class="text-gray-500 dark:text-gray-400">No movies found</p>
+            <p class="text-gray-500">No movies found</p>
         </div>
         {% endif %}
     </div>
 </div>
+
+<script>
+function filterTable(inputId, tableId) {
+    var filter = document.getElementById(inputId).value.toUpperCase();
+    var rows = document.getElementById(tableId).getElementsByTagName("tr");
+    for (var i = 1; i < rows.length; i++) {
+        var td = rows[i].getElementsByTagName("td")[0];
+        if (td) {
+            var txtValue = td.textContent || td.innerText;
+            rows[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+}
+</script>
 {% endblock %}
