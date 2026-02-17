@@ -15,7 +15,7 @@ class CacheScheduler:
     def start(self):
         settings = get_user_settings()
         
-        # We import inside the function to avoid Circular Import errors
+        # Internal imports to prevent circular dependency
         from app.services.exclusions import run_full_operation
         from app.services.ca_mover import check_ca_mover_logs
 
@@ -61,4 +61,5 @@ class CacheScheduler:
     def shutdown(self):
         self.scheduler.shutdown()
 
-scheduler = CacheScheduler()
+# This must match what main.py and your routers are importing
+scheduler_service = CacheScheduler()
