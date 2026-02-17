@@ -12,16 +12,22 @@ class ExclusionManager:
     def __init__(self):
         self.output_file = Path("/config/mover_exclusions.txt")
 
-    def _exists_on_cache(self, host_path: str) -> bool:
-        """Translate host path to container mount path and check existence"""
+    def _to_container_path(self, path: str) -> str:
+        """Prepend container cache mount to get checkable path"""
         settings = get_user_settings()
-        host_prefix = settings.exclusions.host_cache_path
-        container_prefix = settings.exclusions.cache_mount_path
-        logger.info(f"PATH CHECK | host_prefix={host_prefix!r} container_prefix={container_prefix!r}")
-        logger.info(f"PATH CHECK | original={host_path!r}")
-        container_path = host_path.replace(host_prefix, container_prefix)
-        logger.info(f"PATH CHECK | translated={container_path!r} exists={os.path.exists(container_path)}")
-        return os.path.exists(container_path)
+        return settings.exclusions.cache_mount_path.rstrip('/') + '/' + path.lstrip('/')
+
+    def _to_host_path(self, path: str) -> str:
+        """Prepend host cache path for writing to exclusion file"""
+        settings = get_user_settings()
+        return settings.exclusions.host_cache_path.rstrip('/') + '/' + path.lstrip('/')
+
+    def _exists_on_cache(self, path: str) -> bool:
+        """Check if path exists via container mount"""
+        container_path = self._to_container_path(path)
+        result = os.path.exists(container_path)
+        logger.debug(f"PATH CHECK | container={container_path!r} exists={result}")
+        return result
 
     def build_exclusions(self):
         logger.info("Building exclusions list...")
@@ -90,9 +96,19 @@ class ExclusionManager:
 
         final_list = sorted(valid_paths)
 
+        # Convert validated paths to host paths for the exclusion file
+        host_paths = []
+        settings2 = get_user_settings()
+        for p in final_list:
+            # PlexCache paths already have full host path, others need prefix
+            if p.startswith(settings2.exclusions.host_cache_path) or p.startswith(settings2.exclusions.cache_mount_path):
+                host_paths.append(p)
+            else:
+                host_paths.append(self._to_host_path(p))
+
         try:
             with open(self.output_file, 'w') as f:
-                for path in final_list:
+                for path in host_paths:
                     f.write(f"{path}\n")
 
             settings.exclusions.last_build = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
