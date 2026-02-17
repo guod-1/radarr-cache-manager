@@ -1,11 +1,18 @@
 from app.core.scheduler import scheduler_service
 from fastapi import APIRouter, Request, Form
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
 from app.core.config import get_user_settings, save_user_settings
 import logging
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")
+
+@router.get("", response_class=HTMLResponse)
+async def settings_page(request: Request):
+    settings = get_user_settings()
+    return templates.TemplateResponse("settings.html", {"request": request, "settings": settings})
 
 @router.post("/paths/save")
 async def save_paths(
@@ -25,5 +32,21 @@ async def save_paths(
     settings.exclusions.log_monitor_cron = log_monitor_cron
     save_user_settings(settings)
     scheduler_service.reload_jobs()
+    logger.info("System paths and schedules updated.")
     return RedirectResponse(url="/settings?status=success", status_code=303)
-# ... other routes remained the same ...
+
+@router.post("/radarr/save")
+async def save_radarr(url: str = Form(...), api_key: str = Form(...)):
+    settings = get_user_settings()
+    settings.radarr["url"] = url
+    settings.radarr["api_key"] = api_key
+    save_user_settings(settings)
+    return RedirectResponse(url="/settings?radarr_status=success", status_code=303)
+
+@router.post("/sonarr/save")
+async def save_sonarr(url: str = Form(...), api_key: str = Form(...)):
+    settings = get_user_settings()
+    settings.sonarr["url"] = url
+    settings.sonarr["api_key"] = api_key
+    save_user_settings(settings)
+    return RedirectResponse(url="/settings?sonarr_status=success", status_code=303)
