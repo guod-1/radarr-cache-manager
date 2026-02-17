@@ -13,9 +13,9 @@
             </div>
             <div class="p-6">
                 <form action="/settings/radarr/save" method="POST" class="space-y-4">
-                    <input type="text" name="url" value="{{ settings.radarr.url }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
-                    <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
-                    <button type="submit" class="w-full bg-primary-600 py-2 rounded-lg text-white">Save Radarr</button>
+                    <input type="text" name="url" value="{{ settings.radarr.url }}" placeholder="http://ip:7878" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
+                    <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" placeholder="API Key" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
+                    <button type="submit" class="w-full bg-primary-600 hover:bg-primary-500 py-2 rounded-lg text-white font-bold transition">Save Radarr</button>
                 </form>
             </div>
         </div>
@@ -25,29 +25,32 @@
             </div>
             <div class="p-6">
                 <form action="/settings/sonarr/save" method="POST" class="space-y-4">
-                    <input type="text" name="url" value="{{ settings.sonarr.url }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
-                    <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm">
-                    <button type="submit" class="w-full bg-primary-600 py-2 rounded-lg text-white">Save Sonarr</button>
+                    <input type="text" name="url" value="{{ settings.sonarr.url }}" placeholder="http://ip:8989" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
+                    <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" placeholder="API Key" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
+                    <button type="submit" class="w-full bg-primary-600 hover:bg-primary-500 py-2 rounded-lg text-white font-bold transition">Save Sonarr</button>
                 </form>
             </div>
         </div>
     </div>
 
     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-700 bg-gray-850">
+        <div class="px-6 py-4 border-b border-gray-700 bg-gray-850 flex justify-between items-center">
             <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-clock mr-2 text-primary-500"></i> Paths & Automation</h2>
+            {% if request.query_params.get('status') == 'success' %}
+                <span class="text-green-400 text-[10px] font-bold uppercase tracking-widest bg-green-950/30 px-2 py-1 rounded border border-green-900/50">Settings Saved</span>
+            {% endif %}
         </div>
         <div class="p-6">
             <form action="/settings/paths/save" method="POST" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Full Sync Schedule (Cron)</label>
-                        <input type="text" name="full_sync_cron" value="{{ settings.exclusions.full_sync_cron|default('0 * * * *') }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
+                        <input type="text" name="full_sync_cron" value="{{ settings.exclusions.full_sync_cron }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
                         <p class="text-[10px] text-gray-500 mt-1 italic">Example: "0 * * * *" is every hour. "30 3 * * *" is 3:30 AM daily.</p>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Log Monitor Schedule (Cron)</label>
-                        <input type="number" name="log_monitor_interval" value="{{ settings.exclusions.log_monitor_interval|default(300) }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
+                        <input type="text" name="log_monitor_cron" value="{{ settings.exclusions.log_monitor_cron }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
                         <p class="text-[10px] text-gray-500 mt-1 italic">Example: "*/5 * * * *" is every 5 minutes.</p>
                     </div>
                 </div>
@@ -55,11 +58,22 @@
                 <div class="border-t border-gray-700 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cache Mount Point</label>
-                        <input type="text" name="cache_mount_path" value="{{ settings.exclusions.cache_mount_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
+                        <input type="text" name="cache_mount_path" value="{{ settings.exclusions.cache_mount_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mover Tuning Log Path</label>
-                        <input type="text" name="ca_mover_log_path" value="{{ settings.exclusions.ca_mover_log_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs">
+                        <input type="text" name="ca_mover_log_path" value="{{ settings.exclusions.ca_mover_log_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Movie Base Path (Host)</label>
+                        <input type="text" name="movie_base_path" value="{{ settings.exclusions.movie_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">TV Base Path (Host)</label>
+                        <input type="text" name="tv_base_path" value="{{ settings.exclusions.tv_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
                     </div>
                 </div>
 
