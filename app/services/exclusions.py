@@ -8,27 +8,25 @@ from app.services.sonarr import get_sonarr_client
 
 logger = logging.getLogger(__name__)
 
-# paths come from settings now
-# paths come from settings now
-
-def to_container_path(host_path: str) -> str:
-    """Translate host path to container path for existence check"""
-    settings = get_user_settings()
-    return host_path.replace(settings.exclusions.host_cache_path, settings.exclusions.cache_mount_path)
-
 class ExclusionManager:
     def __init__(self):
         self.output_file = Path("/config/mover_exclusions.txt")
 
     def _exists_on_cache(self, host_path: str) -> bool:
-        """Check if a host path exists by translating to container mount path"""
-        container_path = to_container_path(host_path)
-        return os.path.exists(container_path)
+        """Translate host path to container mount path and check existence"""
+        settings = get_user_settings()
+        host_prefix = settings.exclusions.host_cache_path  # e.g. /mnt/chloe
+        container_prefix = settings.exclusions.cache_mount_path  # e.g. /mnt/cache
+        container_path = host_path.replace(host_prefix, container_prefix)
+        result = os.path.exists(container_path)
+        if not result:
+            logger.debug(f"Not on cache: {container_path}")
+        return result
 
     def build_exclusions(self):
         logger.info("Building exclusions list...")
-        all_paths = set()
         settings = get_user_settings()
+        all_paths = set()
 
         # 1. Custom folders - use as-is
         for folder in settings.exclusions.custom_folders:
@@ -47,7 +45,7 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Error reading PlexCache file: {e}")
 
-        # 3. Radarr paths - use full file path if downloaded, else folder
+        # 3. Radarr - use full file path if downloaded, else folder
         if settings.exclusions.radarr_exclude_tag_ids:
             try:
                 movies = get_radarr_client().get_all_movies()
@@ -62,7 +60,7 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Radarr exclusion build failed: {e}")
 
-        # 4. Sonarr paths - individual episode files
+        # 4. Sonarr - individual episode files
         if settings.exclusions.sonarr_exclude_tag_ids:
             try:
                 sonarr = get_sonarr_client()
@@ -81,7 +79,7 @@ class ExclusionManager:
             except Exception as e:
                 logger.error(f"Sonarr exclusion build failed: {e}")
 
-        # 5. Validate - check container path (/mnt/cache) but write host path (/mnt/chloe)
+        # 5. Validate existence via container path, write host path to file
         valid_paths = []
         skipped = 0
         for p in all_paths:
