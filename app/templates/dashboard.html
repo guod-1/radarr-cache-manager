@@ -1,55 +1,87 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto space-y-6">
-    <div class="flex justify-between items-center bg-gray-800 p-6 rounded-2xl border border-gray-700">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-bold text-white">System Overview</h1>
-            <p class="text-gray-400 text-sm">MTEM v2.0 Production Environment</p>
-        </div>
-        <form action="/dashboard/run-builder" method="post">
-            <button type="submit" class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded-lg font-bold transition flex items-center shadow-lg shadow-teal-900/20">
-                <i class="fa-solid fa-play mr-2"></i> Run Builder Now
-            </button>
-        </form>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-            <p class="text-xs font-bold text-gray-500 uppercase">Radarr</p>
-            <div class="flex items-center mt-1">
-                <div class="h-2 w-2 rounded-full {{ 'bg-green-500' if radarr_up else 'bg-red-500' }} mr-2"></div>
-                <span class="text-white font-medium">{{ 'Online' if radarr_up else 'Offline' }}</span>
-            </div>
-        </div>
-        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-            <p class="text-xs font-bold text-gray-500 uppercase">Sonarr</p>
-            <div class="flex items-center mt-1">
-                <div class="h-2 w-2 rounded-full {{ 'bg-green-500' if sonarr_up else 'bg-red-500' }} mr-2"></div>
-                <span class="text-white font-medium">{{ 'Online' if sonarr_up else 'Offline' }}</span>
-            </div>
-        </div>
-        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-            <p class="text-xs font-bold text-gray-500 uppercase">Movies Protected</p>
-            <p class="text-2xl font-bold text-white mt-1">{{ stats.get('movie_count', 0) }}</p>
-        </div>
-        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-            <p class="text-xs font-bold text-gray-500 uppercase">TV Protected</p>
-            <p class="text-2xl font-bold text-white mt-1">{{ stats.get('tv_count', 0) }}</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Mover Tuning Exclusion Manager</p>
         </div>
     </div>
 
-    <div class="bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden">
-        <div class="p-4 border-b border-gray-700 bg-gray-700/30 font-bold text-sm text-gray-300">Automation Health</div>
-        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-                <p class="text-gray-400 text-xs uppercase font-bold">Last Exclusion Build</p>
-                <p class="text-teal-400 font-mono mt-1">{{ settings.exclusions.last_build or 'Never' }}</p>
-            </div>
-            <div>
-                <p class="text-gray-400 text-xs uppercase font-bold">Cache Savings</p>
-                <p class="text-teal-400 font-mono mt-1">{{ stats.get('total_size', '0 GB') }}</p>
+    <!-- Status Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Radarr Status -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Radarr Status</div>
+            <div class="flex items-center mt-2">
+                <div class="h-3 w-3 rounded-full {{ 'bg-green-500' if radarr_up else 'bg-red-500' }} mr-2"></div>
+                <div class="text-lg font-bold {{ 'text-green-600' if radarr_up else 'text-red-600' }}">
+                    {% if radarr_up %}Connected{% else %}Disconnected{% endif %}
+                </div>
             </div>
         </div>
+
+        <!-- Sonarr Status -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Sonarr Status</div>
+            <div class="flex items-center mt-2">
+                <div class="h-3 w-3 rounded-full {{ 'bg-green-500' if sonarr_up else 'bg-red-500' }} mr-2"></div>
+                <div class="text-lg font-bold {{ 'text-green-600' if sonarr_up else 'text-red-600' }}">
+                    {% if sonarr_up %}Connected{% else %}Disconnected{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Movies Protected -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Movies Protected</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ movie_count }}</div>
+            <div class="text-xs text-gray-400 mt-1">with exclusion tags</div>
+        </div>
+
+        <!-- TV Shows Protected -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">TV Shows Protected</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ tv_count }}</div>
+            <div class="text-xs text-gray-400 mt-1">with exclusion tags</div>
+        </div>
+
+    </div>
+
+    <!-- Additional Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        
+        <!-- Total Exclusions -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Exclusions</div>
+            <div id="dashboard-exclusion-count" class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ exclusion_count }}</div>
+            <div class="text-xs text-gray-400 mt-1">Last Build: {{ last_build }}</div>
+        </div>
+
+        <!-- CA Mover Status -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">CA Mover Tuning</div>
+            <div class="text-lg font-medium text-gray-900 dark:text-white mt-2">{{ ca_mover_status }}</div>
+            <div class="text-xs text-gray-400 mt-1">Last Run: {{ last_mover_run }}</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-lg">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Quick Actions</div>
+            <div class="space-y-2">
+                <form action="/operations/run/exclusions" method="post" class="inline-block w-full">
+                    <button type="submit" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded">
+                        Build Exclusions Now
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
