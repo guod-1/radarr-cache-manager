@@ -5,6 +5,14 @@ from typing import List, Optional
 
 CONFIG_PATH = "/config/settings.json"
 
+class RadarrSettings(BaseModel):
+    url: str = ""
+    api_key: str = ""
+
+class SonarrSettings(BaseModel):
+    url: str = ""
+    api_key: str = ""
+
 class SchedulerSettings(BaseModel):
     enabled: bool = True
     cron_expression: str = "0 */6 * * *"
@@ -23,8 +31,8 @@ class ExclusionSettings(BaseModel):
     log_monitor_cron: str = "*/5 * * * *"
 
 class UserSettings(BaseModel):
-    radarr: dict = {"url": "", "api_key": ""}
-    sonarr: dict = {"url": "", "api_key": ""}
+    radarr: RadarrSettings = RadarrSettings()
+    sonarr: SonarrSettings = SonarrSettings()
     exclusions: ExclusionSettings = ExclusionSettings()
     scheduler: SchedulerSettings = SchedulerSettings()
 

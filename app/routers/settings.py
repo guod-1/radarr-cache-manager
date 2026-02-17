@@ -38,15 +38,15 @@ async def save_paths(
 @router.post("/radarr/save")
 async def save_radarr(url: str = Form(...), api_key: str = Form(...)):
     settings = get_user_settings()
-    settings.radarr["url"] = url
-    settings.radarr["api_key"] = api_key
+    settings.radarr.url = url
+    settings.radarr.api_key = api_key
     save_user_settings(settings)
     return RedirectResponse(url="/settings?radarr_status=success", status_code=303)
 
 @router.post("/sonarr/save")
 async def save_sonarr(url: str = Form(...), api_key: str = Form(...)):
     settings = get_user_settings()
-    settings.sonarr["url"] = url
-    settings.sonarr["api_key"] = api_key
+    settings.sonarr.url = url
+    settings.sonarr.api_key = api_key
     save_user_settings(settings)
     return RedirectResponse(url="/settings?sonarr_status=success", status_code=303)
