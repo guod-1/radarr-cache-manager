@@ -78,7 +78,7 @@ class MoverLogParser:
     def get_cache_usage(self):
         try:
             settings = get_user_settings()
-            usage = shutil.disk_usage(settings.exclusions.cache_mount_path or "/mnt/chloe")
+            usage = shutil.disk_usage(settings.exclusions.cache_mount_path or "/mnt/cache")
             percent = (usage.used / usage.total) * 100 if usage.total > 0 else 0
             return {"percent": round(percent, 1), "used": usage.used}
         except: return {"percent": 0, "used": 0}
