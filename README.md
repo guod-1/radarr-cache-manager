@@ -42,3 +42,15 @@ The **Cache Mount Point** setting (`/mnt/cache` by default) is used separately f
 ## Output
 
 The exclusion file is written to `/config/mover_exclusions.txt`. Point CA Mover Tuning to this file in its plugin settings.
+
+## Settings Reference
+
+| Setting | Description |
+|---|---|
+| **Cache Mount Point** | Where your cache drive is mounted *inside this container* (e.g. `/mnt/cache`). Used only to check whether paths exist on cache before including them in the exclusion file. Never written to the output file. |
+| **Path Mappings** | Prefix rewrites applied when writing paths to the exclusion file. Radarr/Sonarr/PlexCache store paths using their own internal mounts — use this to translate them to host-accessible paths. |
+| **Mover Tuning Log Path** | Path to the CA Mover Tuning log file inside the container. Map your Unraid log directory here to enable mover activity monitoring and stats. |
+| **Movie Base Path (Host)** | Root folder for movies on your cache drive as seen by the Unraid host. Used for display and stats only. |
+| **TV Base Path (Host)** | Root folder for TV shows on your cache drive as seen by the Unraid host. Used for display and stats only. |
+| **Exclusion Builder Schedule** | Cron expression controlling how often Radarr/Sonarr are queried and the exclusion file is rebuilt. |
+| **Log Monitor Schedule** | Cron expression controlling how often the mover log is scanned to refresh stats. |
