@@ -12,13 +12,23 @@ class ExclusionManager:
     def __init__(self):
         self.output_file = Path("/config/mover_exclusions.txt")
 
-    def _apply_path_mappings(self, path: str) -> str:
-        """Apply user-defined path mappings to rewrite path for exclusion file"""
+    def _apply_path_mappings(self, path: str, source: str = "") -> str:
+        """Apply named service path mapping to rewrite path for exclusion file"""
         settings = get_user_settings()
-        for mapping in settings.exclusions.path_mappings:
-            if mapping.from_prefix and path.startswith(mapping.from_prefix):
-                return mapping.to_prefix + path[len(mapping.from_prefix):]
-        # No mapping matched - return as-is
+        if source == "radarr":
+            m = settings.exclusions.radarr_mapping
+        elif source == "sonarr":
+            m = settings.exclusions.sonarr_mapping
+        elif source == "plexcache":
+            m = settings.exclusions.plexcache_mapping
+        else:
+            # fallback: try all three in order
+            for m in [settings.exclusions.radarr_mapping, settings.exclusions.sonarr_mapping, settings.exclusions.plexcache_mapping]:
+                if m.from_prefix and path.startswith(m.from_prefix):
+                    return m.to_prefix + path[len(m.from_prefix):]
+            return path
+        if m.from_prefix and path.startswith(m.from_prefix):
+            return m.to_prefix + path[len(m.from_prefix):]
         return path
 
     def _to_container_path(self, path: str) -> str:
@@ -49,6 +59,7 @@ class ExclusionManager:
                 all_paths.add(folder.strip())
 
         # 2. PlexCache-D paths
+        plexcache_paths = set()
         pc_path = Path(settings.exclusions.plexcache_file_path)
         if pc_path.exists():
             try:
@@ -57,14 +68,13 @@ class ExclusionManager:
                         line = line.strip()
                         if not line or line.startswith('#'):
                             continue
-                        # PlexCache paths start with /chloe/tv/ or /chloe/movies/
-                        # Remap to full host path: /mnt/chloe/data/media/...
-                        line = line.replace('/chloe/', '/mnt/chloe/data/media/', 1)
-                        all_paths.add(line)
+                        plexcache_paths.add(line)
             except Exception as e:
                 logger.error(f"Error reading PlexCache file: {e}")
+        all_paths.update(plexcache_paths)
 
         # 3. Radarr - use full file path if downloaded, else folder
+        radarr_paths = set()
         if settings.exclusions.radarr_exclude_tag_ids:
             try:
                 movies = get_radarr_client().get_all_movies()
@@ -75,11 +85,12 @@ class ExclusionManager:
                         folder_path = m.get('path')
                         path = (file_path or folder_path or '').strip()
                         if path:
-                            all_paths.add(path)
+                            radarr_paths.add(path)
             except Exception as e:
                 logger.error(f"Radarr exclusion build failed: {e}")
 
         # 4. Sonarr - individual episode files
+        sonarr_paths = set()
         if settings.exclusions.sonarr_exclude_tag_ids:
             try:
                 sonarr = get_sonarr_client()
@@ -92,11 +103,14 @@ class ExclusionManager:
                             for ep in episode_files:
                                 ep_path = (ep.get('path') or '').strip()
                                 if ep_path:
-                                    all_paths.add(ep_path)
+                                    sonarr_paths.add(ep_path)
                         elif s.get('path'):
-                            all_paths.add(s['path'].strip())
+                            sonarr_paths.add(s['path'].strip())
             except Exception as e:
                 logger.error(f"Sonarr exclusion build failed: {e}")
+
+        all_paths.update(radarr_paths)
+        all_paths.update(sonarr_paths)
 
         # 5. Validate existence via container path, write host path to file
         valid_paths = []
@@ -109,8 +123,13 @@ class ExclusionManager:
 
         final_list = sorted(valid_paths)
 
-        # Apply path mappings to produce final exclusion file paths
-        mapped_paths = [self._apply_path_mappings(p) for p in final_list]
+        # Apply source-aware path mappings to produce final exclusion file paths
+        def map_path(p):
+            if p in radarr_paths: return self._apply_path_mappings(p, "radarr")
+            if p in sonarr_paths: return self._apply_path_mappings(p, "sonarr")
+            if p in plexcache_paths: return self._apply_path_mappings(p, "plexcache")
+            return self._apply_path_mappings(p)
+        mapped_paths = [map_path(p) for p in final_list]
 
         try:
             with open(self.output_file, 'w') as f:
