@@ -112,23 +112,25 @@ class ExclusionManager:
         all_paths.update(radarr_paths)
         all_paths.update(sonarr_paths)
 
-        # 5. Validate existence via container path, write host path to file
-        valid_paths = []
-        skipped = 0
-        for p in all_paths:
-            if self._exists_on_cache(p):
-                valid_paths.append(p)
-            else:
-                skipped += 1
-
-        final_list = sorted(valid_paths)
-
-        # Apply source-aware path mappings to produce final exclusion file paths
+        # 5. Map paths then validate existence then write.
+        # PlexCache raw paths (e.g. /chloe/tv/...) must be mapped to host paths
+        # before existence check since raw prefix has no container mount.
         def map_path(p):
             if p in radarr_paths: return self._apply_path_mappings(p, "radarr")
             if p in sonarr_paths: return self._apply_path_mappings(p, "sonarr")
             if p in plexcache_paths: return self._apply_path_mappings(p, "plexcache")
             return self._apply_path_mappings(p)
+
+        valid_paths = []
+        skipped = 0
+        for p in all_paths:
+            check_path = map_path(p) if p in plexcache_paths else p
+            if self._exists_on_cache(check_path):
+                valid_paths.append(p)
+            else:
+                skipped += 1
+
+        final_list = sorted(valid_paths)
         mapped_paths = [map_path(p) for p in final_list]
 
         try:
