@@ -39,10 +39,14 @@ async def movies_page(request: Request):
     except Exception as e:
         logger.error(f"Failed to fetch movies: {e}")
     
+    # Collect all unique tags across all movies for filter UI
+    all_tag_labels = sorted(set(tag for m in movies for tag in m['tags']))
+
     context = {
         "request": request,
         "movies": movies,
-        "total": len(movies)
+        "total": len(movies),
+        "all_tags": all_tag_labels
     }
     
     return templates.TemplateResponse("movies.html", context)

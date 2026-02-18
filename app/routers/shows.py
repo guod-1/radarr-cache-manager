@@ -40,10 +40,13 @@ async def shows_page(request: Request):
     except Exception as e:
         logger.error(f"Failed to fetch shows: {e}")
     
+    all_tag_labels = sorted(set(tag for s in shows for tag in s['tags']))
+
     context = {
         "request": request,
         "shows": shows,
-        "total": len(shows)
+        "total": len(shows),
+        "all_tags": all_tag_labels
     }
     
     return templates.TemplateResponse("shows.html", context)

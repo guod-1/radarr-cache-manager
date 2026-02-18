@@ -1,13 +1,36 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-white">TV Shows <span class="text-lg font-normal text-gray-400">({{ total }})</span></h1>
-        <input type="text" id="showSearch" onkeyup="filterTable('showSearch', 'showsTable')"
+    <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+        <h1 class="text-3xl font-bold text-white">TV Shows <span id="visibleCount" class="text-lg font-normal text-gray-400">({{ total }})</span></h1>
+        <input type="text" id="showSearch" oninput="applyFilters()"
                placeholder="Search shows..."
                class="bg-gray-900 border border-gray-700 text-gray-300 text-sm rounded-lg px-4 py-2 w-72 focus:ring-1 focus:ring-teal-500 outline-none">
     </div>
+
+    <!-- Tag filters -->
+    {% if all_tags %}
+    <div class="flex flex-wrap gap-2 mb-6">
+        <button onclick="setTagFilter(null, this)"
+                class="tag-filter-btn active px-3 py-1 rounded-full text-xs font-bold border transition
+                       bg-teal-900 border-teal-700 text-teal-200">
+            All
+        </button>
+        <button onclick="setTagFilter('__untagged__', this)"
+                class="tag-filter-btn px-3 py-1 rounded-full text-xs font-bold border transition
+                       bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700">
+            No Tags
+        </button>
+        {% for tag in all_tags %}
+        <button onclick="setTagFilter('{{ tag }}', this)"
+                data-tag="{{ tag }}"
+                class="tag-filter-btn px-3 py-1 rounded-full text-xs font-bold border transition
+                       bg-gray-800 border-gray-600 text-gray-400 hover:bg-teal-900 hover:border-teal-700 hover:text-teal-200">
+            {{ tag }}
+        </button>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="bg-gray-800 shadow rounded-lg overflow-hidden">
         <table id="showsTable" class="min-w-full divide-y divide-gray-700">
@@ -21,16 +44,14 @@
             </thead>
             <tbody class="bg-gray-800 divide-y divide-gray-700">
                 {% for show in shows %}
-                <tr>
+                <tr data-title="{{ show.title | lower }}" data-tags="{{ show.tags | join(',') | lower }}">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ show.title }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ show.year }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ show.seasons }}</td>
                     <td class="px-6 py-4 text-sm text-gray-400">
                         <div class="flex flex-wrap gap-1">
                             {% for tag in show.tags %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-900 text-teal-200">
-                                {{ tag }}
-                            </span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-900 text-teal-200">{{ tag }}</span>
                             {% endfor %}
                         </div>
                     </td>
@@ -39,24 +60,40 @@
             </tbody>
         </table>
         {% if not shows %}
-        <div class="text-center py-12">
-            <p class="text-gray-500">No TV shows found</p>
-        </div>
+        <div class="text-center py-12"><p class="text-gray-500">No TV shows found</p></div>
         {% endif %}
     </div>
 </div>
 
 <script>
-function filterTable(inputId, tableId) {
-    var filter = document.getElementById(inputId).value.toUpperCase();
-    var rows = document.getElementById(tableId).getElementsByTagName("tr");
-    for (var i = 1; i < rows.length; i++) {
-        var td = rows[i].getElementsByTagName("td")[0];
-        if (td) {
-            var txtValue = td.textContent || td.innerText;
-            rows[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-        }
-    }
+let activeTag = null;
+
+function setTagFilter(tag, btn) {
+    activeTag = tag;
+    document.querySelectorAll('.tag-filter-btn').forEach(b => {
+        b.classList.remove('bg-teal-900', 'border-teal-700', 'text-teal-200', 'active');
+        b.classList.add('bg-gray-800', 'border-gray-600', 'text-gray-400');
+    });
+    btn.classList.add('bg-teal-900', 'border-teal-700', 'text-teal-200', 'active');
+    btn.classList.remove('bg-gray-800', 'border-gray-600', 'text-gray-400');
+    applyFilters();
+}
+
+function applyFilters() {
+    const search = document.getElementById('showSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('#showsTable tbody tr');
+    let visible = 0;
+    rows.forEach(row => {
+        const title = row.dataset.title || '';
+        const tags = row.dataset.tags || '';
+        const matchesSearch = !search || title.includes(search);
+        let matchesTag = true;
+        if (activeTag === '__untagged__') matchesTag = tags === '';
+        else if (activeTag) matchesTag = tags.split(',').includes(activeTag.toLowerCase());
+        row.style.display = matchesSearch && matchesTag ? '' : 'none';
+        if (matchesSearch && matchesTag) visible++;
+    });
+    document.getElementById('visibleCount').textContent = `(${visible})`;
 }
 </script>
 {% endblock %}
