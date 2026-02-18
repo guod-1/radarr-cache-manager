@@ -17,7 +17,7 @@ class SchedulerSettings(BaseModel):
     enabled: bool = True
     cron_expression: str = "0 */6 * * *"
 
-class PathMapping(BaseModel):
+class ServicePathMapping(BaseModel):
     from_prefix: str = ""
     to_prefix: str = ""
 
@@ -31,10 +31,9 @@ class ExclusionSettings(BaseModel):
     host_cache_path: str = "/mnt/chloe"
     movie_base_path: str = "/mnt/cache/data/media/movies/"
     tv_base_path: str = "/mnt/cache/data/media/tv/"
-    path_mappings: List[PathMapping] = [
-        PathMapping(from_prefix="/data/", to_prefix="/mnt/chloe/data/"),
-        PathMapping(from_prefix="/chloe/", to_prefix="/mnt/chloe/data/media/")
-    ]
+    radarr_mapping: ServicePathMapping = ServicePathMapping(from_prefix="/data/", to_prefix="/mnt/chloe/data/")
+    sonarr_mapping: ServicePathMapping = ServicePathMapping(from_prefix="/data/", to_prefix="/mnt/chloe/data/")
+    plexcache_mapping: ServicePathMapping = ServicePathMapping(from_prefix="/chloe/", to_prefix="/mnt/chloe/data/media/")
     last_build: Optional[str] = None
     full_sync_cron: str = "0 * * * *"
     log_monitor_cron: str = "*/5 * * * *"
