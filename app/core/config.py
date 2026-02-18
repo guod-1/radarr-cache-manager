@@ -2,7 +2,6 @@ import json
 import os
 from pydantic import BaseModel
 from typing import List, Optional
-from __future__ import annotations
 
 CONFIG_PATH = "/config/settings.json"
 
