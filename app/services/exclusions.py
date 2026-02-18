@@ -134,8 +134,11 @@ class ExclusionManager:
         valid_paths = []
         skipped = 0
         for p in all_paths:
-            check_path = map_path(p) if p in plexcache_paths else p
-            if self._exists_on_cache(check_path):
+            # PlexCache paths are already guaranteed on cache - skip existence check
+            if p in plexcache_paths:
+                valid_paths.append(p)
+                continue
+            if self._exists_on_cache(p):
                 valid_paths.append(p)
             else:
                 skipped += 1
