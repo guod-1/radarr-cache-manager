@@ -11,7 +11,7 @@
                     <option value="">-- Select a Radarr Tag --</option>
                     {% for tag in tags %}<option value="{{ tag.id }}">{{ tag.label }}</option>{% endfor %}
                 </select>
-                <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg font-bold transition">Add</button>
+                <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-bold transition shadow-lg shadow-black/30">Add</button>
             </div>
         </form>
         <div class="flex flex-wrap gap-2 mt-4">
@@ -34,7 +34,7 @@
                     <option value="">-- Select a Sonarr Tag --</option>
                     {% for tag in sonarr_tags %}<option value="{{ tag.id }}">{{ tag.label }}</option>{% endfor %}
                 </select>
-                <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg font-bold transition">Add</button>
+                <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-bold transition shadow-lg shadow-black/30">Add</button>
             </div>
         </form>
         <div class="flex flex-wrap gap-2 mt-4">
@@ -54,7 +54,7 @@
         <p class="text-xs text-gray-500 mb-4 font-mono">Current path: {{ user_settings.exclusions.plexcache_file_path }}</p>
         <form action="/exclusions/plexcache" method="POST" class="flex gap-2">
             <input type="text" name="plexcache_file_path" value="{{ user_settings.exclusions.plexcache_file_path }}" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-sm outline-none">
-            <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">Update Path</button>
+            <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-lg shadow-black/30">Update Path</button>
         </form>
     </div>
 
