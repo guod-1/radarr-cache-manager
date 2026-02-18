@@ -85,9 +85,9 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase">Path Mappings</label>
                             <p class="text-[10px] text-gray-500 mt-1 italic">
-                                Rewrite API paths before writing to the exclusion file.
-                                <strong class="text-gray-400">From</strong> = prefix returned by Radarr/Sonarr/PlexCache.
-                                <strong class="text-gray-400">To</strong> = prefix on your cache drive (e.g. <span class="font-mono text-teal-400">{{ settings.exclusions.cache_mount_path }}</span>).
+                                Radarr, Sonarr, and PlexCache store paths using their own internal container mounts — these often don't match the actual path on your Unraid cache drive.
+                                Use these mappings to rewrite those prefixes before they're written to the exclusion file that CA Mover reads.
+                                <br><span class="text-gray-400 not-italic">Example: Sonarr stores <span class="font-mono text-yellow-500">/data/tv/Show</span> but on your cache drive it lives at <span class="font-mono text-teal-400">/mnt/cache/data/tv/Show</span> — so map <span class="font-mono text-yellow-500">/data/</span> → <span class="font-mono text-teal-400">/mnt/cache/data/</span>.</span>
                             </p>
                         </div>
                         <button type="button" onclick="addMappingRow()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg transition">+ Add Row</button>
@@ -97,7 +97,7 @@
                         <div class="flex gap-2 items-center mapping-row">
                             <input type="text" name="from_prefix_{{ loop.index0 }}" value="{{ m.from_prefix }}" placeholder="/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
                             <span class="text-gray-500 text-sm">→</span>
-                            <input type="text" name="to_prefix_{{ loop.index0 }}" value="{{ m.to_prefix }}" placeholder="/mnt/chloe/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <input type="text" name="to_prefix_{{ loop.index0 }}" value="{{ m.to_prefix }}" placeholder="/mnt/cache/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
                             <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-500 hover:text-red-400 transition text-lg leading-none px-1">×</button>
                         </div>
                         {% endfor %}
@@ -124,7 +124,7 @@
                 row.innerHTML = `
                     <input type="text" name="from_prefix_${i}" placeholder="/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
                     <span class="text-gray-500 text-sm">→</span>
-                    <input type="text" name="to_prefix_${i}" placeholder="/mnt/chloe/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                    <input type="text" name="to_prefix_${i}" placeholder="/mnt/cache/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
                     <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-500 hover:text-red-400 transition text-lg leading-none px-1">×</button>
                 `;
                 table.appendChild(row);

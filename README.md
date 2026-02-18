@@ -1,27 +1,44 @@
-# Mover Tuning Exclusion Manager (MTEM) v2.0
+# Mover Tuning Exclusion Manager
 
-![Project Icon](logo.png)
+A self-hosted Docker app for Unraid that automatically generates exclusion files for the [CA Mover Tuning](https://forums.unraid.net/topic/70783-plugin-ca-mover-tuning/) plugin — keeping your tagged media pinned to the cache drive and out of the array.
 
-MTEM is a specialized automation tool designed for **Unraid** users. It bridges the gap between your media services (Radarr/Sonarr) and the **CA Mover Tuning** plugin by dynamically managing your mover exclusion list.
+## What it does
 
-## 🚀 Key Features in v2.0
-* **Dual-Cron Automation**: Independent scheduling for the Exclusion Builder and the Log Monitor.
-* **Dynamic Exclusion Generation**: Automatically scans your Radarr/Sonarr libraries to ensure files currently being seeded or accessed aren't moved prematurely from the cache.
-* **Real-Time Dashboard**: Monitor your cache health, protected file counts, and mover logs through a sleek, modern web interface.
-* **Seamless Integration**: Designed to output the standard `unraid_mover_exclusions.txt` format used by the CA Mover Tuning plugin.
+CA Mover Tuning can skip moving specific files/folders by reading an exclusion list. Building and maintaining that list manually is tedious. This app automates it by:
 
-## 🛠️ Installation & Setup
+- Querying **Radarr** and **Sonarr** for media tagged with your chosen "keep on cache" tags
+- Reading **PlexCache-D** exclusion output (optional)
+- Validating that each path actually exists on the cache drive
+- Writing a clean exclusion file that CA Mover reads on each run
 
-1.  **Docker Deployment**: Deploy the container pointing to your script directory.
-2.  **Service Links**: Input your Radarr/Sonarr URLs and API keys in the **Settings** tab.
-3.  **Configure Schedules**:
-    * **Exclusion Builder**: Set how often the script rebuilds your exclusion list (e.g., `0 * * * *` for hourly).
-    * **Log Monitor**: Set how often the dashboard refreshes its mover statistics (e.g., `*/5 * * * *` for every 5 minutes).
+## Path Mappings
 
-## 📂 Configuration Paths
-* **Cache Mount**: Typically `/mnt/cache`
-* **Exclusion File**: `/plexcache/unraid_mover_exclusions.txt`
-* **Mover Logs**: Path to your `ca.mover.tuning.log`
+Radarr, Sonarr, and PlexCache store file paths using their own internal container mounts. These rarely match the actual path on your Unraid host. The **Path Mappings** table in Settings lets you define prefix rewrites applied before paths are written to the exclusion file.
 
----
-*Developed for the Unraid community to optimize SSD cache lifespan and media availability.*
+| From (API returns) | To (written to exclusion file) |
+|---|---|
+| `/data/` | `/mnt/cache/data/` |
+| `/chloe/` | `/mnt/cache/data/media/` |
+
+The **Cache Mount Point** setting (`/mnt/cache` by default) is used separately for existence validation inside the container — it does not affect what gets written to the file.
+
+## Setup
+
+1. Add the container in Unraid Community Apps or manually via Docker
+2. Map `/config`, `/plexcache` (optional), and your cache drive (e.g. `/mnt/cache`)
+3. Open the UI and configure Radarr/Sonarr API credentials
+4. Set your tags, path mappings, and schedule
+5. Trigger a manual build or wait for the scheduler
+
+## Container Paths
+
+| Container Path | Purpose |
+|---|---|
+| `/config` | Persistent settings and output exclusion file |
+| `/mnt/cache` | Cache drive mount for path validation |
+| `/plexcache` | PlexCache-D output directory (optional) |
+| `/mover_logs` | CA Mover Tuning log directory (optional) |
+
+## Output
+
+The exclusion file is written to `/config/mover_exclusions.txt`. Point CA Mover Tuning to this file in its plugin settings.
