@@ -6,124 +6,165 @@
         <p class="text-gray-400 mt-1">Configure your service connections, paths, and automation schedules</p>
     </div>
 
+    <!-- Service Connections -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Radarr -->
         <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700 bg-gray-850">
+            <div class="px-6 py-4 border-b border-gray-700 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+                    <i class="fa-solid fa-film text-yellow-400 text-xs"></i>
+                </div>
                 <h2 class="text-lg font-semibold text-white">Radarr</h2>
+                {% if request.query_params.get("radarr_status") == "success" %}
+                <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-green-400 bg-green-950/40 px-2 py-1 rounded border border-green-900/50">● Connected</span>
+                {% elif request.query_params.get("radarr_status") == "error" %}
+                <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-950/40 px-2 py-1 rounded border border-red-900/50">✗ Failed</span>
+                {% endif %}
             </div>
             <div class="p-6">
-                <form action="/settings/radarr/save" method="POST" class="space-y-4">
-                    <input type="text" name="url" value="{{ settings.radarr.url }}" placeholder="http://ip:7878" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
-                    <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" placeholder="API Key" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
-                    <button type="submit" class="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg text-white font-bold transition shadow-lg shadow-black/30">Save Radarr</button>
-                    {% if request.query_params.get("radarr_status") == "success" %}
-                    <p class="text-green-400 text-xs text-center mt-2 flex items-center justify-center gap-1">✓ Connected successfully</p>
-                    {% elif request.query_params.get("radarr_status") == "error" %}
-                    <p class="text-red-400 text-xs text-center mt-2 flex items-center justify-center gap-1">✗ Connection failed — check URL and API key</p>
-                    {% endif %}
+                <form action="/settings/radarr/save" method="POST" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">URL</label>
+                        <input type="text" name="url" value="{{ settings.radarr.url }}" placeholder="http://192.168.1.x:7878" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm font-mono outline-none focus:ring-1 focus:ring-yellow-500/50 focus:border-yellow-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">API Key</label>
+                        <input type="password" name="api_key" value="{{ settings.radarr.api_key }}" placeholder="••••••••••••••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none focus:ring-1 focus:ring-yellow-500/50 focus:border-yellow-500/50">
+                    </div>
+                    <button type="submit" class="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg text-white font-bold transition shadow-lg shadow-black/30 mt-2">Save &amp; Test</button>
                 </form>
             </div>
         </div>
+
+        <!-- Sonarr -->
         <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700 bg-gray-850">
+            <div class="px-6 py-4 border-b border-gray-700 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                    <i class="fa-solid fa-tv text-blue-400 text-xs"></i>
+                </div>
                 <h2 class="text-lg font-semibold text-white">Sonarr</h2>
+                {% if request.query_params.get("sonarr_status") == "success" %}
+                <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-green-400 bg-green-950/40 px-2 py-1 rounded border border-green-900/50">● Connected</span>
+                {% elif request.query_params.get("sonarr_status") == "error" %}
+                <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-950/40 px-2 py-1 rounded border border-red-900/50">✗ Failed</span>
+                {% endif %}
             </div>
             <div class="p-6">
-                <form action="/settings/sonarr/save" method="POST" class="space-y-4">
-                    <input type="text" name="url" value="{{ settings.sonarr.url }}" placeholder="http://ip:8989" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
-                    <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" placeholder="API Key" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none">
-                    <button type="submit" class="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg text-white font-bold transition shadow-lg shadow-black/30">Save Sonarr</button>
-                    {% if request.query_params.get("sonarr_status") == "success" %}
-                    <p class="text-green-400 text-xs text-center mt-2 flex items-center justify-center gap-1">✓ Connected successfully</p>
-                    {% elif request.query_params.get("sonarr_status") == "error" %}
-                    <p class="text-red-400 text-xs text-center mt-2 flex items-center justify-center gap-1">✗ Connection failed — check URL and API key</p>
-                    {% endif %}
+                <form action="/settings/sonarr/save" method="POST" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">URL</label>
+                        <input type="text" name="url" value="{{ settings.sonarr.url }}" placeholder="http://192.168.1.x:8989" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm font-mono outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">API Key</label>
+                        <input type="password" name="api_key" value="{{ settings.sonarr.api_key }}" placeholder="••••••••••••••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50">
+                    </div>
+                    <button type="submit" class="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg text-white font-bold transition shadow-lg shadow-black/30 mt-2">Save &amp; Test</button>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Paths & Automation -->
     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-700 bg-gray-850 flex justify-between items-center">
-            <h2 class="text-lg font-semibold text-white"><i class="fa-solid fa-clock mr-2 text-primary-500"></i> Paths & Automation</h2>
+        <div class="px-6 py-4 border-b border-gray-700 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                <i class="fa-solid fa-clock text-primary-400 text-xs"></i>
+            </div>
+            <h2 class="text-lg font-semibold text-white">Paths &amp; Automation</h2>
             {% if request.query_params.get('status') == 'success' %}
-                <span class="text-green-400 text-[10px] font-bold uppercase tracking-widest bg-green-950/30 px-2 py-1 rounded border border-green-900/50">Settings Saved</span>
+            <span class="ml-auto text-[10px] font-bold uppercase tracking-widest text-green-400 bg-green-950/40 px-2 py-1 rounded border border-green-900/50">● Settings Saved</span>
             {% endif %}
         </div>
         <div class="p-6">
-            <form action="/settings/paths/save" method="POST" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Exclusion Builder Scheduler (Cron)</label>
-                        <p class="text-[10px] text-teal-500 font-mono mb-1">Last Run: {{ settings.exclusions.last_build or "Never" }}</p>
-                        <input type="text" name="full_sync_cron" value="{{ settings.exclusions.full_sync_cron }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">This triggers the scan of Radarr/Sonarr and rebuilds the exclusion file.</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Log Monitor Schedule (Cron)</label>
-                        <p class="text-[10px] text-teal-500 font-mono mb-1">Last Run: {{ settings.exclusions.last_stats_update or "Never" }}</p>
-                        <input type="text" name="log_monitor_cron" value="{{ settings.exclusions.log_monitor_cron }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Example: "*/5 * * * *" is every 5 minutes.</p>
+            <form action="/settings/paths/save" method="POST" class="space-y-8">
+
+                <!-- Schedules -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <span class="w-4 h-px bg-gray-600"></span> Schedules <span class="flex-1 h-px bg-gray-700"></span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Exclusion Builder</label>
+                            <p class="text-[10px] text-teal-500 font-mono mb-2">Last Run: {{ settings.exclusions.last_build or "Never" }}</p>
+                            <input type="text" name="full_sync_cron" value="{{ settings.exclusions.full_sync_cron }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">Triggers Radarr/Sonarr scan and rebuilds the exclusion file.</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Log Monitor</label>
+                            <p class="text-[10px] text-teal-500 font-mono mb-2">Last Run: {{ settings.exclusions.last_stats_update or "Never" }}</p>
+                            <input type="text" name="log_monitor_cron" value="{{ settings.exclusions.log_monitor_cron }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">Scans mover log to refresh stats. e.g. <span class="font-mono not-italic text-gray-400">*/5 * * * *</span></p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="border-t border-gray-700 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cache Mount Point</label>
-                        <input type="text" name="cache_mount_path" value="{{ settings.exclusions.cache_mount_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Where your cache drive is mounted <strong class="text-gray-400">inside this container</strong>. Used only to verify files exist on cache before adding them to the exclusion list. Never written to the output file.</p>
-                        
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mover Tuning Log Path</label>
-                        <input type="text" name="ca_mover_log_path" value="{{ settings.exclusions.ca_mover_log_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Path to the CA Mover Tuning log file inside this container. Used to monitor mover activity and update stats. Map your Unraid <span class="font-mono text-yellow-500">/boot/logs/</span> or plugin log directory to the container path set here.</p>
-                        
+                <!-- Cache & Logs -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <span class="w-4 h-px bg-gray-600"></span> Cache &amp; Logs <span class="flex-1 h-px bg-gray-700"></span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Cache Mount Point</label>
+                            <input type="text" name="cache_mount_path" value="{{ settings.exclusions.cache_mount_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">Where your cache drive is mounted <strong class="text-gray-400">inside this container</strong>. Used only to verify files exist on cache — never written to the output file.</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mover Tuning Log Path</label>
+                            <input type="text" name="ca_mover_log_path" value="{{ settings.exclusions.ca_mover_log_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">CA Mover Tuning log path inside this container. Map your Unraid <span class="font-mono text-yellow-500 not-italic">/boot/logs/</span> directory here.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Movie Base Path (Host)</label>
-                        <input type="text" name="movie_base_path" value="{{ settings.exclusions.movie_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">The root folder where movies are stored on your cache drive, as seen by the <strong class="text-gray-400">Unraid host</strong>. Used for display and stats — not for path validation.</p>
-                        
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">TV Base Path (Host)</label>
-                        <input type="text" name="tv_base_path" value="{{ settings.exclusions.tv_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono text-xs outline-none">
-                        <p class="text-[10px] text-gray-500 mt-1 italic">The root folder where TV shows are stored on your cache drive, as seen by the <strong class="text-gray-400">Unraid host</strong>. Used for display and stats — not for path validation.</p>
-                        
+                <!-- Media Paths -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <span class="w-4 h-px bg-gray-600"></span> Media Paths <span class="flex-1 h-px bg-gray-700"></span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Movie Base Path <span class="text-gray-600 normal-case font-normal">(host)</span></label>
+                            <input type="text" name="movie_base_path" value="{{ settings.exclusions.movie_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">Root movie folder on the Unraid host. Used for display and stats only.</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">TV Base Path <span class="text-gray-600 normal-case font-normal">(host)</span></label>
+                            <input type="text" name="tv_base_path" value="{{ settings.exclusions.tv_base_path }}" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">Root TV folder on the Unraid host. Used for display and stats only.</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Path Mappings -->
-                <div class="border-t border-gray-700 pt-6">
-                    <div class="flex justify-between items-center mb-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase">Path Mappings</label>
-                            <p class="text-[10px] text-gray-500 mt-1 italic">
-                                Radarr, Sonarr, and PlexCache store paths using their own internal container mounts — these often don't match the actual path on your Unraid cache drive.
-                                Use these mappings to rewrite those prefixes before they're written to the exclusion file that CA Mover reads.
-                                <br><span class="text-gray-400 not-italic">Example: Sonarr stores <span class="font-mono text-yellow-500">/data/tv/Show</span> but on your cache drive it lives at <span class="font-mono text-teal-400">/mnt/cache/data/tv/Show</span> — so map <span class="font-mono text-yellow-500">/data/</span> → <span class="font-mono text-teal-400">/mnt/cache/data/</span>.</span>
-                            </p>
-                        </div>
-                        <button type="button" onclick="addMappingRow()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg font-bold transition shadow-lg shadow-black/30">+ Add Row</button>
-                    </div>
-                    <div id="path-mappings-table" class="space-y-2">
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                        <span class="w-4 h-px bg-gray-600"></span> Path Mappings <span class="flex-1 h-px bg-gray-700"></span>
+                    </h3>
+                    <p class="text-[10px] text-gray-500 mb-4 italic">
+                        Radarr, Sonarr, and PlexCache store paths using their own internal mounts which don't match your Unraid host paths.
+                        These mappings rewrite path prefixes before writing to the exclusion file.
+                        <span class="text-gray-400 not-italic block mt-1">
+                            e.g. <span class="font-mono text-yellow-500">/data/</span> → <span class="font-mono text-teal-400">/mnt/cache/data/</span>
+                        </span>
+                    </p>
+                    <div id="path-mappings-table" class="space-y-2 mb-3">
                         {% for m in settings.exclusions.path_mappings %}
                         <div class="flex gap-2 items-center mapping-row">
                             <input type="text" name="from_prefix_{{ loop.index0 }}" value="{{ m.from_prefix }}" placeholder="/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
-                            <span class="text-gray-500 text-sm">→</span>
+                            <span class="text-gray-500 text-sm shrink-0">→</span>
                             <input type="text" name="to_prefix_{{ loop.index0 }}" value="{{ m.to_prefix }}" placeholder="/mnt/cache/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
-                            <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-500 hover:text-red-400 transition text-lg leading-none px-1">×</button>
+                            <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-600 hover:text-red-400 transition text-xl leading-none w-6 shrink-0 text-center">×</button>
                         </div>
                         {% endfor %}
                     </div>
+                    <button type="button" onclick="addMappingRow()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-lg shadow-black/30">+ Add Mapping</button>
                 </div>
 
-                <div class="flex justify-end pt-4">
-                    <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-8 rounded-lg transition shadow-lg shadow-black/30">Save All System Settings</button>
+                <div class="flex justify-end pt-2 border-t border-gray-700">
+                    <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 px-10 rounded-lg transition shadow-lg shadow-black/30">Save All System Settings</button>
                 </div>
             </form>
 
@@ -141,9 +182,9 @@
                 row.className = 'flex gap-2 items-center mapping-row';
                 row.innerHTML = `
                     <input type="text" name="from_prefix_${i}" placeholder="/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
-                    <span class="text-gray-500 text-sm">→</span>
+                    <span class="text-gray-500 text-sm shrink-0">→</span>
                     <input type="text" name="to_prefix_${i}" placeholder="/mnt/cache/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
-                    <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-500 hover:text-red-400 transition text-lg leading-none px-1">×</button>
+                    <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-600 hover:text-red-400 transition text-xl leading-none w-6 shrink-0 text-center">×</button>
                 `;
                 table.appendChild(row);
             }
