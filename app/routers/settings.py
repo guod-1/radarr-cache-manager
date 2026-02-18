@@ -33,17 +33,19 @@ async def save_paths(
     settings.exclusions.full_sync_cron = full_sync_cron
     settings.exclusions.log_monitor_cron = log_monitor_cron
 
-    # Parse dynamic path mappings from form
     form_data = await request.form()
-    mappings = []
-    i = 0
-    while f"from_prefix_{i}" in form_data:
-        from_p = form_data.get(f"from_prefix_{i}", "").strip()
-        to_p = form_data.get(f"to_prefix_{i}", "").strip()
-        if from_p and to_p:
-            mappings.append(PathMapping(from_prefix=from_p, to_prefix=to_p))
-        i += 1
-    settings.exclusions.path_mappings = mappings
+    settings.exclusions.radarr_mapping = ServicePathMapping(
+        from_prefix=form_data.get("radarr_from", "").strip(),
+        to_prefix=form_data.get("radarr_to", "").strip()
+    )
+    settings.exclusions.sonarr_mapping = ServicePathMapping(
+        from_prefix=form_data.get("sonarr_from", "").strip(),
+        to_prefix=form_data.get("sonarr_to", "").strip()
+    )
+    settings.exclusions.plexcache_mapping = ServicePathMapping(
+        from_prefix=form_data.get("plexcache_from", "").strip(),
+        to_prefix=form_data.get("plexcache_to", "").strip()
+    )
 
     save_user_settings(settings)
     scheduler_service.reload_jobs()
