@@ -13,9 +13,16 @@ class ExclusionManager:
         self.output_file = Path("/config/mover_exclusions.txt")
 
     def _to_container_path(self, path: str) -> str:
-        """Prepend container cache mount to get checkable path"""
+        """Translate any host path to container-accessible path for existence check"""
         settings = get_user_settings()
-        return settings.exclusions.cache_mount_path.rstrip('/') + '/' + path.lstrip('/')
+        host = settings.exclusions.host_cache_path.rstrip('/')   # /mnt/chloe
+        container = settings.exclusions.cache_mount_path.rstrip('/')  # /mnt/cache
+        if path.startswith(host + '/') or path == host:
+            # Full host path e.g. /mnt/chloe/data/media/tv/... -> /mnt/cache/data/media/tv/...
+            return container + path[len(host):]
+        else:
+            # Relative path e.g. /data/media/movies/... -> /mnt/cache/data/media/movies/...
+            return container + '/' + path.lstrip('/')
 
     def _to_host_path(self, path: str) -> str:
         """Prepend host cache path for writing to exclusion file"""
