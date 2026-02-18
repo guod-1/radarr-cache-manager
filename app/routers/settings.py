@@ -77,3 +77,45 @@ async def save_sonarr(url: str = Form(...), api_key: str = Form(...)):
         return RedirectResponse(url="/settings?sonarr_status=success", status_code=303)
     except Exception:
         return RedirectResponse(url="/settings?sonarr_status=error", status_code=303)
+
+@router.get("/path-prefixes")
+async def get_path_prefixes():
+    """Detect path prefixes from Radarr, Sonarr, and PlexCache"""
+    from app.services.radarr import get_radarr_client
+    from app.services.sonarr import get_sonarr_client
+    from pathlib import Path
+    results = {}
+    try:
+        movies = get_radarr_client().get_all_movies()
+        for m in movies:
+            p = (m.get('movieFile', {}) or {}).get('path') or m.get('path', '')
+            if p:
+                parts = p.lstrip('/').split('/')
+                results['Radarr'] = '/' + parts[0] + '/'
+                break
+    except Exception as e:
+        results['Radarr'] = f"Error: {e}"
+    try:
+        shows = get_sonarr_client().get_all_series()
+        for s in shows:
+            p = s.get('path', '')
+            if p:
+                parts = p.lstrip('/').split('/')
+                results['Sonarr'] = '/' + parts[0] + '/'
+                break
+    except Exception as e:
+        results['Sonarr'] = f"Error: {e}"
+    try:
+        settings = get_user_settings()
+        pc = Path(settings.exclusions.plexcache_file_path)
+        if pc.exists():
+            with open(pc) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        parts = line.lstrip('/').split('/')
+                        results['Plexcache'] = '/' + parts[0] + '/'
+                        break
+    except Exception as e:
+        results['Plexcache'] = f"Error: {e}"
+    return results
