@@ -12,22 +12,24 @@ class ExclusionManager:
     def __init__(self):
         self.output_file = Path("/config/mover_exclusions.txt")
 
-    def _to_container_path(self, path: str) -> str:
-        """Translate any host path to container-accessible path for existence check"""
+    def _apply_path_mappings(self, path: str) -> str:
+        """Apply user-defined path mappings to rewrite path for exclusion file"""
         settings = get_user_settings()
-        host = settings.exclusions.host_cache_path.rstrip('/')   # /mnt/chloe
-        container = settings.exclusions.cache_mount_path.rstrip('/')  # /mnt/cache
+        for mapping in settings.exclusions.path_mappings:
+            if mapping.from_prefix and path.startswith(mapping.from_prefix):
+                return mapping.to_prefix + path[len(mapping.from_prefix):]
+        # No mapping matched - return as-is
+        return path
+
+    def _to_container_path(self, path: str) -> str:
+        """Translate any path to container-accessible path for existence check"""
+        settings = get_user_settings()
+        host = settings.exclusions.host_cache_path.rstrip('/')
+        container = settings.exclusions.cache_mount_path.rstrip('/')
         if path.startswith(host + '/') or path == host:
-            # Full host path e.g. /mnt/chloe/data/media/tv/... -> /mnt/cache/data/media/tv/...
             return container + path[len(host):]
         else:
-            # Relative path e.g. /data/media/movies/... -> /mnt/cache/data/media/movies/...
             return container + '/' + path.lstrip('/')
-
-    def _to_host_path(self, path: str) -> str:
-        """Prepend host cache path for writing to exclusion file"""
-        settings = get_user_settings()
-        return settings.exclusions.host_cache_path.rstrip('/') + '/' + path.lstrip('/')
 
     def _exists_on_cache(self, path: str) -> bool:
         """Check if path exists via container mount"""
@@ -107,19 +109,12 @@ class ExclusionManager:
 
         final_list = sorted(valid_paths)
 
-        # Convert validated paths to host paths for the exclusion file
-        host_paths = []
-        settings2 = get_user_settings()
-        for p in final_list:
-            # PlexCache paths already have full host path, others need prefix
-            if p.startswith(settings2.exclusions.host_cache_path) or p.startswith(settings2.exclusions.cache_mount_path):
-                host_paths.append(p)
-            else:
-                host_paths.append(self._to_host_path(p))
+        # Apply path mappings to produce final exclusion file paths
+        mapped_paths = [self._apply_path_mappings(p) for p in final_list]
 
         try:
             with open(self.output_file, 'w') as f:
-                for path in host_paths:
+                for path in mapped_paths:
                     f.write(f"{path}\n")
 
             settings.exclusions.last_build = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

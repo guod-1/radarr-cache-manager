@@ -79,10 +79,57 @@
                     </div>
                 </div>
 
+                <!-- Path Mappings -->
+                <div class="border-t border-gray-700 pt-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Path Mappings</label>
+                            <p class="text-[10px] text-gray-500 mt-1 italic">
+                                Rewrite API paths before writing to the exclusion file.
+                                <strong class="text-gray-400">From</strong> = prefix returned by Radarr/Sonarr/PlexCache.
+                                <strong class="text-gray-400">To</strong> = prefix on your cache drive (e.g. <span class="font-mono text-teal-400">{{ settings.exclusions.cache_mount_path }}</span>).
+                            </p>
+                        </div>
+                        <button type="button" onclick="addMappingRow()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg transition">+ Add Row</button>
+                    </div>
+                    <div id="path-mappings-table" class="space-y-2">
+                        {% for m in settings.exclusions.path_mappings %}
+                        <div class="flex gap-2 items-center mapping-row">
+                            <input type="text" name="from_prefix_{{ loop.index0 }}" value="{{ m.from_prefix }}" placeholder="/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <span class="text-gray-500 text-sm">→</span>
+                            <input type="text" name="to_prefix_{{ loop.index0 }}" value="{{ m.to_prefix }}" placeholder="/mnt/chloe/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                            <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-500 hover:text-red-400 transition text-lg leading-none px-1">×</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <div class="flex justify-end pt-4">
                     <button type="submit" class="bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 px-8 rounded-lg transition shadow-lg shadow-primary-950/20">Save All System Settings</button>
                 </div>
             </form>
+
+            <script>
+            function reindexMappings() {
+                document.querySelectorAll('#path-mappings-table .mapping-row').forEach((row, i) => {
+                    row.querySelectorAll('input')[0].name = `from_prefix_${i}`;
+                    row.querySelectorAll('input')[1].name = `to_prefix_${i}`;
+                });
+            }
+            function addMappingRow() {
+                const table = document.getElementById('path-mappings-table');
+                const i = table.querySelectorAll('.mapping-row').length;
+                const row = document.createElement('div');
+                row.className = 'flex gap-2 items-center mapping-row';
+                row.innerHTML = `
+                    <input type="text" name="from_prefix_${i}" placeholder="/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                    <span class="text-gray-500 text-sm">→</span>
+                    <input type="text" name="to_prefix_${i}" placeholder="/mnt/chloe/data/" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-primary-500">
+                    <button type="button" onclick="this.closest('.mapping-row').remove(); reindexMappings();" class="text-gray-500 hover:text-red-400 transition text-lg leading-none px-1">×</button>
+                `;
+                table.appendChild(row);
+            }
+            </script>
         </div>
     </div>
 </div>

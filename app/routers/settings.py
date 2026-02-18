@@ -16,13 +16,15 @@ async def settings_page(request: Request):
 
 @router.post("/paths/save")
 async def save_paths(
+    request: Request,
     cache_mount_path: str = Form(...),
-    movie_base_path: str = Form(...), 
+    movie_base_path: str = Form(...),
     tv_base_path: str = Form(...),
     ca_mover_log_path: str = Form(...),
     full_sync_cron: str = Form(...),
     log_monitor_cron: str = Form(...)
 ):
+    from app.core.config import PathMapping
     settings = get_user_settings()
     settings.exclusions.cache_mount_path = cache_mount_path
     settings.exclusions.movie_base_path = movie_base_path
@@ -30,6 +32,19 @@ async def save_paths(
     settings.exclusions.ca_mover_log_path = ca_mover_log_path
     settings.exclusions.full_sync_cron = full_sync_cron
     settings.exclusions.log_monitor_cron = log_monitor_cron
+
+    # Parse dynamic path mappings from form
+    form_data = await request.form()
+    mappings = []
+    i = 0
+    while f"from_prefix_{i}" in form_data:
+        from_p = form_data.get(f"from_prefix_{i}", "").strip()
+        to_p = form_data.get(f"to_prefix_{i}", "").strip()
+        if from_p and to_p:
+            mappings.append(PathMapping(from_prefix=from_p, to_prefix=to_p))
+        i += 1
+    settings.exclusions.path_mappings = mappings
+
     save_user_settings(settings)
     scheduler_service.reload_jobs()
     logger.info("System paths and schedules updated.")
