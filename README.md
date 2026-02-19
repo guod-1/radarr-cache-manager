@@ -18,7 +18,7 @@ Radarr, Sonarr, and PlexCache store file paths using their own internal containe
 | From (API returns) | To (written to exclusion file) |
 |---|---|
 | `/data/` | `/mnt/cache/data/` |
-| `/chloe/` | `/mnt/cache/data/media/` |
+| `/cache/` | `/mnt/cache/data/media/` |
 
 The **Cache Mount Point** setting (`/mnt/cache` by default) is used separately for existence validation inside the container — it does not affect what gets written to the file.
 
