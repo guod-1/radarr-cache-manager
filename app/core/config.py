@@ -54,6 +54,9 @@ class ExclusionSettings(BaseModel):
 class WebhookSettings(BaseModel):
     enabled: bool = True
     cooldown_seconds: int = 30
+    discord_webhook_url: str = ""
+    discord_enabled: bool = False
+    discord_notify_warnings: bool = False
 
 class UserSettings(BaseModel):
     radarr: RadarrSettings = RadarrSettings()
