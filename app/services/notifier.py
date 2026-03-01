@@ -1,6 +1,9 @@
 import logging
 import requests
+import concurrent.futures
 from datetime import datetime
+
+_executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +22,8 @@ LEVEL_ICONS = {
 }
 
 
-def send_discord_notification(url: str, level: str, source: str, message: str):
+def _send_discord_sync(url: str, level: str, source: str, message: str):
+    """Run in thread executor — never call directly from async context."""
     if not url:
         return
     try:
@@ -35,6 +39,17 @@ def send_discord_notification(url: str, level: str, source: str, message: str):
         logger.debug(f"[NOTIFIER] Discord notification sent: {level} - {message}")
     except Exception as e:
         logger.error(f"[NOTIFIER] Failed to send Discord notification: {e}")
+
+
+def _send_discord_sync(url: str, level: str, source: str, message: str):
+    """Run in thread executor — never call directly from async context."""
+    """Non-blocking wrapper — submits to thread pool."""
+    _executor.submit(_send_discord_sync, url, level, source, message)
+
+
+def send_discord_notification(url: str, level: str, source: str, message: str):
+    """Non-blocking wrapper — submits to thread pool."""
+    _executor.submit(_send_discord_sync, url, level, source, message)
 
 
 def notify(level: str, source: str, message: str):
