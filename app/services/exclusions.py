@@ -5,6 +5,7 @@ from pathlib import Path
 from app.core.config import get_user_settings, save_user_settings
 from app.services.radarr import get_radarr_client
 from app.services.sonarr import get_sonarr_client
+from app.services.alert_log import get_alert_log
 
 logger = logging.getLogger(__name__)
 
@@ -155,10 +156,12 @@ class ExclusionManager:
             save_user_settings(settings)
 
             logger.info(f"Exclusions built. Candidates: {len(all_paths)}, On cache: {len(final_list)}, Skipped: {skipped}")
+            get_alert_log().add("success", "builder", f"Exclusion build completed — {len(final_list)} exclusions written, {skipped} skipped (not on cache)")
             return {"total": len(final_list), "candidates": len(all_paths), "skipped": skipped}
 
         except Exception as e:
             logger.error(f"Failed to write exclusion file: {e}")
+            get_alert_log().add("error", "builder", f"Exclusion build FAILED: {e}")
             raise e
 
     def get_exclusion_stats(self):

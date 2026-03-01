@@ -50,11 +50,17 @@ class ExclusionSettings(BaseModel):
     last_stats_update: Optional[str] = None
 
 
+
+class WebhookSettings(BaseModel):
+    enabled: bool = True
+    cooldown_seconds: int = 30
+
 class UserSettings(BaseModel):
     radarr: RadarrSettings = RadarrSettings()
     sonarr: SonarrSettings = SonarrSettings()
     exclusions: ExclusionSettings = ExclusionSettings()
     scheduler: SchedulerSettings = SchedulerSettings()
+    webhooks: WebhookSettings = WebhookSettings()
 
 
 def _log_settings_snapshot(settings: UserSettings, context: str):

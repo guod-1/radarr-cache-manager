@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
-from app.routers import dashboard, movies, shows, exclusions, settings, logs, stats, operations
+from app.routers import dashboard, movies, shows, exclusions, settings, logs, stats, operations, webhooks
 from app.core.scheduler import scheduler_service
 from app.core.config import get_user_settings
 
@@ -34,6 +34,7 @@ app.include_router(settings.router, prefix="/settings", tags=["Settings"])
 app.include_router(logs.router, prefix="/logs", tags=["Logs"])
 app.include_router(stats.router, prefix="/stats", tags=["Stats"])
 app.include_router(operations.router, prefix="/operations", tags=["Operations"])
+app.include_router(webhooks.router, prefix="/webhooks", tags=["Webhooks"])
 
 
 @app.get("/")

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6 pb-12">
+
+    <div class="flex justify-between items-end">
+        <div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Webhooks</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Incoming triggers from Radarr and Sonarr</p>
+        </div>
+    </div>
+
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
+        <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Webhook Settings</h2>
+        {% if request.query_params.get("status") == "saved" %}
+        <div class="mb-4 text-xs font-bold text-green-400 bg-green-950/40 border border-green-900/50 px-3 py-2 rounded">Settings saved</div>
+        {% endif %}
+        <form action="/webhooks/settings/save" method="POST" class="space-y-6">
+            <div class="flex items-center justify-between bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div>
+                    <div class="text-sm font-bold text-white">Enable Webhooks</div>
+                    <div class="text-xs text-gray-500 mt-0.5">Allow Radarr and Sonarr to trigger exclusion rebuilds</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="enabled" class="sr-only peer" {% if settings.webhooks.enabled %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:bg-teal-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                </label>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Cooldown Period</label>
+                    <p class="text-xs text-gray-500 mb-3">
+                        When a webhook arrives, the app waits this long before rebuilding the exclusion list.
+                        If more webhooks arrive during the wait, the timer resets. This prevents hammering the build
+                        process when Radarr or Sonarr imports many files at once — e.g. 500 episode imports becomes 1 rebuild.
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <input type="range" name="cooldown_seconds" min="30" max="300" step="30"
+                               value="{{ settings.webhooks.cooldown_seconds }}"
+                               oninput="document.getElementById('cooldown_display').textContent = this.value + 's'"
+                               class="flex-1 accent-teal-500">
+                        <span id="cooldown_display" class="text-sm font-mono font-bold text-teal-400 w-16 text-right">{{ settings.webhooks.cooldown_seconds }}s</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-gray-600 mt-1">
+                        <span>30s</span><span>1m</span><span>1m30s</span><span>2m</span><span>2m30s</span><span>3m</span><span>3m30s</span><span>4m</span><span>4m30s</span><span>5m</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="bg-teal-600 hover:bg-teal-500 text-white text-sm font-bold py-2 px-6 rounded-lg transition">Save Settings</button>
+        </form>
+    </div>
+
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
+        <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Webhook URLs</h2>
+        <p class="text-xs text-gray-500 mb-4">Add these URLs in Radarr/Sonarr under Settings → Connect → Webhook. Select the events you want to trigger a rebuild.</p>
+        <div class="space-y-3">
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-5 h-5 rounded bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-film text-yellow-400 text-[10px]"></i>
+                        </div>
+                        <span class="text-sm font-bold text-white">Radarr</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mb-1">Recommended events: On Import, On Movie Added, On Movie Delete, On Tag Change</div>
+                    <code class="text-xs font-mono text-teal-400">http://YOUR-UNRAID-IP:5858/webhooks/radarr</code>
+                </div>
+                <i class="fa-solid fa-circle text-xs {% if settings.webhooks.enabled %}text-green-400{% else %}text-gray-600{% endif %}"></i>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-5 h-5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-tv text-blue-400 text-[10px]"></i>
+                        </div>
+                        <span class="text-sm font-bold text-white">Sonarr</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mb-1">Recommended events: On Import, On Series Add, On Episode File Delete, On Tag Change</div>
+                    <code class="text-xs font-mono text-teal-400">http://YOUR-UNRAID-IP:5858/webhooks/sonarr</code>
+                </div>
+                <i class="fa-solid fa-circle text-xs {% if settings.webhooks.enabled %}text-green-400{% else %}text-gray-600{% endif %}"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
+            <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Recent Activity</h2>
+            <form action="/webhooks/alerts/clear" method="POST">
+                <button type="submit" class="text-xs text-gray-500 hover:text-red-400 transition font-bold">Clear All</button>
+            </form>
+        </div>
+        <div class="divide-y divide-gray-800">
+            {% if alerts %}
+                {% for alert in alerts %}
+                <div class="px-6 py-3 flex items-start gap-4">
+                    <div class="mt-0.5 shrink-0">
+                        {% if alert.level == "success" %}
+                            <i class="fa-solid fa-circle-check text-green-400 text-xs"></i>
+                        {% elif alert.level == "error" %}
+                            <i class="fa-solid fa-circle-xmark text-red-400 text-xs"></i>
+                        {% elif alert.level == "warning" %}
+                            <i class="fa-solid fa-triangle-exclamation text-yellow-400 text-xs"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-info text-blue-400 text-xs"></i>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs text-white">{{ alert.message }}</div>
+                        <div class="text-[10px] text-gray-600 mt-0.5">{{ alert.source }} · {{ alert.timestamp }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="px-6 py-8 text-center text-xs text-gray-600">No activity yet — waiting for webhooks</div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
