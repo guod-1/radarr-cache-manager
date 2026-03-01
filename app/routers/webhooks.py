@@ -77,6 +77,7 @@ async def test_notification():
         settings.webhooks.discord_webhook_url,
         "success",
         "MTEM",
+        "Test notification from Mover Tuning Exclusion Manager — everything is working!"
     )
     return RedirectResponse(url="/webhooks?status=test_sent", status_code=303)
 
