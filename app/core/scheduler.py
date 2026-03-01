@@ -32,7 +32,10 @@ def run_stats_task():
         from app.services.ca_mover import get_mover_parser
         parser = get_mover_parser()
         stats = parser.get_latest_stats()
-        logger.info(f"[SCHEDULER] Stats refresh complete — excluded={stats.get('excluded', '?')} moved={stats.get('moved', '?')}")
+        if stats:
+            logger.info(f"[SCHEDULER] Stats refresh complete — excluded={stats.get('excluded', '?')} moved={stats.get('moved', '?')}")
+        else:
+            logger.info("[SCHEDULER] Stats refresh complete — no mover log files found yet")
     except Exception as e:
         logger.error(f"[SCHEDULER] Stats refresh FAILED: {e}", exc_info=True)
         return
