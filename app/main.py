@@ -8,7 +8,7 @@ from app.core.scheduler import scheduler_service
 from app.core.config import get_user_settings
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler("/config/app.log"),
