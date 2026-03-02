@@ -74,7 +74,14 @@ class DiscordLogHandler(logging.Handler):
     Logging handler that forwards ERROR and optionally WARNING
     log messages to Discord automatically.
     """
+    _emitting = False
+
     def emit(self, record: logging.LogRecord):
+        if self.__class__._emitting:
+            return
+        if record.name.startswith("app.services.notifier") or record.name.startswith("app.core.config"):
+            return
+        self.__class__._emitting = True
         try:
             from app.core.config import get_user_settings
             settings = get_user_settings()
@@ -98,3 +105,5 @@ class DiscordLogHandler(logging.Handler):
             )
         except Exception:
             pass
+        finally:
+            self.__class__._emitting = False
