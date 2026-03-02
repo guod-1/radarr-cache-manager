@@ -3,7 +3,6 @@ import os
 import logging
 from datetime import datetime
 from typing import List, Optional
-from app.services.notifier import notify
 
 logger = logging.getLogger(__name__)
 
@@ -57,10 +56,7 @@ class AlertLog:
         self.alerts = self.alerts[:MAX_ALERTS]
         self._save()
         logger.info(f"[ALERTS] [{level.upper()}] {source}: {message}")
-        try:
-            notify(level, source, message)
-        except Exception as e:
-            logger.error(f"[ALERTS] Discord notify failed: {e}")
+
 
     def get_all(self) -> List[dict]:
         return self.alerts
