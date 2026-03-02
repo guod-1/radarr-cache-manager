@@ -56,9 +56,9 @@ def notify(level: str, source: str, message: str):
         return
     if source == "builder" and level == "error" and not w.discord_notify_build_failure:
         return
-    if source == "radarr" and not w.discord_notify_radarr_webhook:
+    if source == "radarr" and level == "info" and not w.discord_notify_radarr_webhook:
         return
-    if source == "sonarr" and not w.discord_notify_sonarr_webhook:
+    if source == "sonarr" and level == "info" and not w.discord_notify_sonarr_webhook:
         return
     if source in ("radarr", "sonarr") and level == "error" and not w.discord_notify_connection_errors:
         return
