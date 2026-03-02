@@ -22,13 +22,9 @@ class SonarrClient:
     def get_all_series(self):
         """Get all series from Sonarr"""
         if not self.url or not self.api_key: return []
-        try:
-            response = requests.get(f"{self.url}/api/v3/series", headers=self._get_headers(), timeout=60)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            logger.error(f"Failed to fetch shows: {e}")
-            return []
+        response = requests.get(f"{self.url}/api/v3/series", headers=self._get_headers(), timeout=60)
+        response.raise_for_status()
+        return response.json()
 
     def get_episode_files(self, series_id):
         """Returns actual files on disk for a series"""

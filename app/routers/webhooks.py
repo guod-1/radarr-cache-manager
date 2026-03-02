@@ -88,6 +88,13 @@ async def test_notification():
     return RedirectResponse(url="/webhooks?status=test_sent", status_code=303)
 
 
+@router.get("/status")
+async def webhook_status():
+    from app.services.webhook_handler import _timers
+    pending = {k: True for k, v in _timers.items() if v is not None}
+    return {"pending": pending}
+
+
 @router.post("/alerts/clear")
 async def clear_alerts():
     get_alert_log().clear()

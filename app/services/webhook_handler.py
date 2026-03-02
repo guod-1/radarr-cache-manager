@@ -30,7 +30,7 @@ def trigger_rebuild(source: str):
         return
 
     cooldown = settings.webhooks.cooldown_seconds
-    alerts.add("info", "webhook", f"Webhook received from {source} — rebuild scheduled in {cooldown}s")
+    alerts.add("info", source, f"Webhook received from {source} — rebuild scheduled in {cooldown}s")
     logger.info(f"[WEBHOOK] Trigger from {source} — cooldown={cooldown}s")
 
     with _timer_lock:

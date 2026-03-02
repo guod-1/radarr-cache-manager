@@ -22,13 +22,9 @@ class RadarrClient:
     def get_all_movies(self):
         """Get all movies from Radarr"""
         if not self.url or not self.api_key: return []
-        try:
-            response = requests.get(f"{self.url}/api/v3/movie", headers=self._get_headers(), timeout=60)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            logger.error(f"Failed to fetch movies: {e}")
-            return []
+        response = requests.get(f"{self.url}/api/v3/movie", headers=self._get_headers(), timeout=60)
+        response.raise_for_status()
+        return response.json()
 
     def get_all_tags(self):
         if not self.url or not self.api_key: return []

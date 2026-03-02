@@ -177,12 +177,12 @@
 
     <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
-            <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Recent Activity</h2>
+            <div class="flex items-center gap-4"><h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Recent Activity</h2><span id="cooldown-indicator" class="text-xs text-gray-600">✓ No rebuild pending</span></div>
             <form action="/webhooks/alerts/clear" method="POST">
                 <button type="submit" class="text-xs text-gray-500 hover:text-red-400 transition font-bold">Clear All</button>
             </form>
         </div>
-        <div class="divide-y divide-gray-800">
+        <div id="alert-feed" class="divide-y divide-gray-800">
             {% if alerts %}
                 {% for alert in alerts %}
                 <div class="px-6 py-3 flex items-start gap-4">
@@ -210,4 +210,40 @@
     </div>
 
 </div>
+
+<script>
+// Auto-refresh alert feed every 10 seconds
+let refreshTimer = setInterval(refreshAlerts, 10000);
+
+async function refreshAlerts() {
+    try {
+        const res = await fetch(window.location.pathname + window.location.search);
+        const html = new DOMParser().parseFromString(await res.text(), 'text/html');
+        const newFeed = html.querySelector('#alert-feed');
+        const oldFeed = document.querySelector('#alert-feed');
+        if (newFeed && oldFeed) oldFeed.innerHTML = newFeed.innerHTML;
+    } catch(e) {}
+}
+
+// Cooldown status polling every 3 seconds
+async function pollCooldown() {
+    try {
+        const res = await fetch('/webhooks/status');
+        const data = await res.json();
+        const indicator = document.querySelector('#cooldown-indicator');
+        if (!indicator) return;
+        const pending = Object.keys(data.pending || {});
+        if (pending.length > 0) {
+            indicator.textContent = '⏳ Rebuild pending for: ' + pending.join(', ');
+            indicator.className = 'text-xs text-yellow-400 font-bold';
+        } else {
+            indicator.textContent = '✓ No rebuild pending';
+            indicator.className = 'text-xs text-gray-600';
+        }
+    } catch(e) {}
+}
+setInterval(pollCooldown, 3000);
+pollCooldown();
+</script>
+
 {% endblock %}
