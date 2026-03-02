@@ -18,10 +18,6 @@ logging.basicConfig(
 
 logging.getLogger("apscheduler").setLevel(logging.INFO)
 
-from app.services.notifier import DiscordLogHandler
-_discord_handler = DiscordLogHandler()
-_discord_handler.setLevel(logging.WARNING)
-logging.getLogger().addHandler(_discord_handler)
 logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
