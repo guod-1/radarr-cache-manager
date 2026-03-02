@@ -99,6 +99,7 @@ class ExclusionManager:
                             radarr_paths.add(path)
             except Exception as e:
                 logger.error(f"Radarr exclusion build failed: {e}")
+                get_alert_log().add("error", "radarr", f"Radarr connection failed during build: {e}")
 
         # 4. Sonarr - individual episode files
         sonarr_paths = set()
@@ -119,6 +120,7 @@ class ExclusionManager:
                             sonarr_paths.add(s['path'].strip())
             except Exception as e:
                 logger.error(f"Sonarr exclusion build failed: {e}")
+                get_alert_log().add("error", "sonarr", f"Sonarr connection failed during build: {e}")
 
         all_paths.update(radarr_paths)
         all_paths.update(sonarr_paths)
