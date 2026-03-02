@@ -56,7 +56,13 @@ class WebhookSettings(BaseModel):
     cooldown_seconds: int = 30
     discord_webhook_url: str = ""
     discord_enabled: bool = False
-    discord_notify_warnings: bool = False
+    discord_notify_build_success: bool = True
+    discord_notify_build_failure: bool = True
+    discord_notify_radarr_webhook: bool = True
+    discord_notify_sonarr_webhook: bool = True
+    discord_notify_connection_errors: bool = True
+    discord_notify_log_errors: bool = True
+    discord_notify_log_warnings: bool = False
 
 class UserSettings(BaseModel):
     radarr: RadarrSettings = RadarrSettings()

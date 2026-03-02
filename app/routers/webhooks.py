@@ -60,7 +60,13 @@ async def save_notification_settings(request: Request):
     settings = get_user_settings()
     settings.webhooks.discord_webhook_url = form.get("discord_webhook_url", "").strip()
     settings.webhooks.discord_enabled = form.get("discord_enabled") == "on"
-    settings.webhooks.discord_notify_warnings = form.get("discord_notify_warnings") == "on"
+    settings.webhooks.discord_notify_build_success = form.get("discord_notify_build_success") == "on"
+    settings.webhooks.discord_notify_build_failure = form.get("discord_notify_build_failure") == "on"
+    settings.webhooks.discord_notify_radarr_webhook = form.get("discord_notify_radarr_webhook") == "on"
+    settings.webhooks.discord_notify_sonarr_webhook = form.get("discord_notify_sonarr_webhook") == "on"
+    settings.webhooks.discord_notify_connection_errors = form.get("discord_notify_connection_errors") == "on"
+    settings.webhooks.discord_notify_log_errors = form.get("discord_notify_log_errors") == "on"
+    settings.webhooks.discord_notify_log_warnings = form.get("discord_notify_log_warnings") == "on"
     save_user_settings(settings)
     logger.info(f"[WEBHOOK] Discord settings saved — enabled={settings.webhooks.discord_enabled}")
     return RedirectResponse(url="/webhooks?status=saved", status_code=303)

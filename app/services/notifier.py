@@ -48,15 +48,22 @@ def send_discord_notification(url: str, level: str, source: str, message: str):
 def notify(level: str, source: str, message: str):
     from app.core.config import get_user_settings
     settings = get_user_settings()
-    if not settings.webhooks.discord_enabled:
+    w = settings.webhooks
+    if not w.discord_enabled or not w.discord_webhook_url:
         return
-    if not settings.webhooks.discord_webhook_url:
+    # Per-event toggles
+    if source == "builder" and level == "success" and not w.discord_notify_build_success:
         return
-    if level == "warning" and not settings.webhooks.discord_notify_warnings:
+    if source == "builder" and level == "error" and not w.discord_notify_build_failure:
         return
-    send_discord_notification(
-        settings.webhooks.discord_webhook_url,
-        level,
-        source,
-        message
-    )
+    if source == "radarr" and not w.discord_notify_radarr_webhook:
+        return
+    if source == "sonarr" and not w.discord_notify_sonarr_webhook:
+        return
+    if source in ("radarr", "sonarr") and level == "error" and not w.discord_notify_connection_errors:
+        return
+    if source == "log" and level == "error" and not w.discord_notify_log_errors:
+        return
+    if source == "log" and level == "warning" and not w.discord_notify_log_warnings:
+        return
+    send_discord_notification(w.discord_webhook_url, level, source, message)

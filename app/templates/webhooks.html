@@ -111,15 +111,59 @@
                            class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none focus:ring-1 focus:ring-teal-500">
                     <p class="text-[10px] text-gray-500 mt-1">Discord: Server Settings -> Integrations -> Webhooks -> New Webhook -> Copy URL</p>
                 </div>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="text-sm font-bold text-white">Notify on Warnings</div>
-                        <div class="text-xs text-gray-500 mt-0.5">Also send warning-level alerts, not just errors</div>
+                <div class="pt-2 border-t border-gray-700">
+                    <div class="text-xs font-bold text-gray-400 uppercase mb-3">Notify on these events</div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-300">Build completed successfully</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="discord_notify_build_success" class="sr-only peer" {% if settings.webhooks.discord_notify_build_success %}checked{% endif %}>
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-300">Build failed</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="discord_notify_build_failure" class="sr-only peer" {% if settings.webhooks.discord_notify_build_failure %}checked{% endif %}>
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-300">Radarr webhook received</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="discord_notify_radarr_webhook" class="sr-only peer" {% if settings.webhooks.discord_notify_radarr_webhook %}checked{% endif %}>
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-300">Sonarr webhook received</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="discord_notify_sonarr_webhook" class="sr-only peer" {% if settings.webhooks.discord_notify_sonarr_webhook %}checked{% endif %}>
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-300">Connection errors (Radarr/Sonarr unreachable)</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="discord_notify_connection_errors" class="sr-only peer" {% if settings.webhooks.discord_notify_connection_errors %}checked{% endif %}>
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-300">Log errors</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="discord_notify_log_errors" class="sr-only peer" {% if settings.webhooks.discord_notify_log_errors %}checked{% endif %}>
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-300">Log warnings</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="discord_notify_log_warnings" class="sr-only peer" {% if settings.webhooks.discord_notify_log_warnings %}checked{% endif %}>
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
+                            </label>
+                        </div>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="discord_notify_warnings" class="sr-only peer" {% if settings.webhooks.discord_notify_warnings %}checked{% endif %}>
-                        <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:bg-teal-500 transition-all"></div>
-                    </label>
                 </div>
             </div>
             <div class="flex gap-3">
