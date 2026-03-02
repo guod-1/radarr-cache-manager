@@ -4,7 +4,6 @@ import concurrent.futures
 from datetime import datetime
 
 _executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
-
 logger = logging.getLogger(__name__)
 
 LEVEL_COLORS = {
@@ -23,7 +22,7 @@ LEVEL_ICONS = {
 
 
 def _send_discord_sync(url: str, level: str, source: str, message: str):
-    """Run in thread executor — never call directly from async context."""
+    """Blocking HTTP call — always run in thread pool."""
     if not url:
         return
     try:
@@ -41,14 +40,8 @@ def _send_discord_sync(url: str, level: str, source: str, message: str):
         logger.error(f"[NOTIFIER] Failed to send Discord notification: {e}")
 
 
-def _send_discord_sync(url: str, level: str, source: str, message: str):
-    """Run in thread executor — never call directly from async context."""
-    """Non-blocking wrapper — submits to thread pool."""
-    _executor.submit(_send_discord_sync, url, level, source, message)
-
-
 def send_discord_notification(url: str, level: str, source: str, message: str):
-    """Non-blocking wrapper — submits to thread pool."""
+    """Non-blocking — submits HTTP call to thread pool."""
     _executor.submit(_send_discord_sync, url, level, source, message)
 
 
@@ -67,43 +60,3 @@ def notify(level: str, source: str, message: str):
         source,
         message
     )
-
-
-class DiscordLogHandler(logging.Handler):
-    """
-    Logging handler that forwards ERROR and optionally WARNING
-    log messages to Discord automatically.
-    """
-    _emitting = False
-
-    def emit(self, record: logging.LogRecord):
-        if self.__class__._emitting:
-            return
-        if record.name.startswith("app.services.notifier") or record.name.startswith("app.core.config"):
-            return
-        self.__class__._emitting = True
-        try:
-            from app.core.config import get_user_settings
-            settings = get_user_settings()
-            if not settings.webhooks.discord_enabled:
-                return
-            if not settings.webhooks.discord_webhook_url:
-                return
-            if record.levelno == logging.ERROR:
-                level = "error"
-            elif record.levelno == logging.WARNING and settings.webhooks.discord_notify_warnings:
-                level = "warning"
-            else:
-                return
-            source = record.name.split(".")[-1]
-            message = self.format(record)
-            send_discord_notification(
-                settings.webhooks.discord_webhook_url,
-                level,
-                source,
-                message[:1900]
-            )
-        except Exception:
-            pass
-        finally:
-            self.__class__._emitting = False
