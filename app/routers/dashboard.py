@@ -33,7 +33,7 @@ async def dashboard(request: Request):
     if mover_stats:
         filtered = mover_stats.get("files_filtered", 0)
         moved = mover_stats.get("files_moved", 0)
-        ca_mover_status = f"{filtered} Filtered / {moved} Moved"
+        ca_mover_status = f"{filtered} Files Evaluated / {moved} Files Moved to Array"
         ts = mover_stats.get("last_run", "")
         try:
             last_mover_run = datetime.datetime.strptime(ts, "%Y-%m-%dT%H%M%S").strftime("%Y-%m-%d %H:%M")
