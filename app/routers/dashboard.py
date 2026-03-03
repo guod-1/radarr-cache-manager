@@ -31,8 +31,14 @@ async def dashboard(request: Request):
     ca_mover_status = "No logs found"
     last_mover_run = "N/A"
     if mover_stats:
-        ca_mover_status = f"{mover_stats['excluded']} Excluded / {mover_stats['moved']} Moved"
-        last_mover_run = datetime.datetime.fromtimestamp(mover_stats['timestamp']).strftime('%Y-%m-%d %H:%M')
+        filtered = mover_stats.get("files_filtered", 0)
+        moved = mover_stats.get("files_moved", 0)
+        ca_mover_status = f"{filtered} Filtered / {moved} Moved"
+        ts = mover_stats.get("last_run", "")
+        try:
+            last_mover_run = datetime.datetime.strptime(ts, "%Y-%m-%dT%H%M%S").strftime("%Y-%m-%d %H:%M")
+        except Exception:
+            last_mover_run = ts
     
     # Get last build time from file
     last_build = "Never"
