@@ -97,6 +97,38 @@ class CAMoverParser:
             except Exception as e:
                 logger.error(f"[CA_MOVER] Failed to parse Mover_action: {e}")
 
+        # Parse mover log for threshold and status
+        log_path = run.get("mover_tuning")
+        if not log_path:
+            # try alternate key
+            for k, v in run.items():
+                if isinstance(v, str) and v.endswith(".log"):
+                    log_path = v
+                    break
+        if log_path and os.path.exists(log_path):
+            try:
+                with open(log_path) as f:
+                    log_text = f.read()
+                stats["test_mode"] = "Test Mode: yes" in log_text
+                if "Pool is below moving threshold" in log_text:
+                    stats["move_status"] = "below_threshold"
+                elif "No new files will be moved" in log_text:
+                    stats["move_status"] = "nothing_to_move"
+                elif stats["files_moved"] > 0:
+                    stats["move_status"] = "moved"
+                else:
+                    stats["move_status"] = "idle"
+                # Extract threshold percentage
+                import re
+                match = re.search(r'moving threshold percentage:\s+(\d+)%', log_text)
+                if match:
+                    stats["cache_used_pct_at_run"] = int(match.group(1))
+                match2 = re.search(r'Moving threshold: (\d+)%', log_text)
+                if match2:
+                    stats["move_threshold_pct"] = int(match2.group(1))
+            except Exception as e:
+                logger.error(f"[CA_MOVER] Failed to parse mover log: {e}")
+
         logger.info(f"[CA_MOVER] Parsed run {stats['timestamp']} — moved={stats['files_moved']} filtered={stats['files_filtered']}")
         return stats
 
