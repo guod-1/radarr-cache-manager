@@ -60,8 +60,10 @@ async def save_radarr(url: str = Form(...), api_key: str = Form(...)):
     save_user_settings(settings)
     try:
         from app.services.radarr import get_radarr_client
-        get_radarr_client().get_all_movies()
-        return RedirectResponse(url="/settings?radarr_status=success", status_code=303)
+        result = get_radarr_client().test_connection()
+        if result:
+            return RedirectResponse(url="/settings?radarr_status=success", status_code=303)
+        return RedirectResponse(url="/settings?radarr_status=error", status_code=303)
     except Exception:
         return RedirectResponse(url="/settings?radarr_status=error", status_code=303)
 
@@ -73,8 +75,10 @@ async def save_sonarr(url: str = Form(...), api_key: str = Form(...)):
     save_user_settings(settings)
     try:
         from app.services.sonarr import get_sonarr_client
-        get_sonarr_client().get_all_series()
-        return RedirectResponse(url="/settings?sonarr_status=success", status_code=303)
+        result = get_sonarr_client().test_connection()
+        if result:
+            return RedirectResponse(url="/settings?sonarr_status=success", status_code=303)
+        return RedirectResponse(url="/settings?sonarr_status=error", status_code=303)
     except Exception:
         return RedirectResponse(url="/settings?sonarr_status=error", status_code=303)
 

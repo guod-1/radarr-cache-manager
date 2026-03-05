@@ -29,12 +29,32 @@ async def dashboard(request: Request):
     mover_stats = mover.get_latest_stats()
     
     ca_mover_status = "No logs found"
+    ca_mover_cache = ""
     last_mover_run = "N/A"
     if mover_stats:
-        ca_mover_status = f"{mover_stats['excluded']} Excluded / {mover_stats['moved']} Moved"
-        last_mover_run = datetime.datetime.fromtimestamp(mover_stats['timestamp']).strftime('%Y-%m-%d %H:%M')
-    
-    # Get last build time from file
+        moved = mover_stats.get("files_moved", 0)
+        used_pct = mover_stats.get("cache_used_pct", 0)
+        free_gb = mover_stats.get("cache_free_gb", 0)
+        total_gb = mover_stats.get("cache_total_gb", 0)
+        threshold = mover_stats.get("move_threshold_pct", 90)
+        move_status = mover_stats.get("move_status", "idle")
+        test_mode = mover_stats.get("test_mode", False)
+        ca_mover_cache = f"{used_pct}% used — {free_gb:.0f} GiB free of {total_gb:.0f} GiB"
+        if move_status == "below_threshold":
+            ca_mover_status = f"Below {threshold}% threshold — no move needed"
+        elif move_status == "moved":
+            ca_mover_status = f"{moved} files moved to array"
+        elif move_status == "nothing_to_move":
+            ca_mover_status = "Nothing to move"
+        else:
+            ca_mover_status = "Idle"
+        if test_mode:
+            ca_mover_status = "[DRY RUN] " + ca_mover_status
+        ts = mover_stats.get("last_run", "")
+        try:
+            last_mover_run = datetime.datetime.strptime(ts, "%Y-%m-%dT%H%M%S").strftime("%Y-%m-%d %H:%M")
+        except Exception:
+            last_mover_run = ts
     last_build = "Never"
     exclusions_file = "/config/mover_exclusions.txt"
     if os.path.exists(exclusions_file):
@@ -49,6 +69,7 @@ async def dashboard(request: Request):
         "tv_count": counts['tv_count'],
         "exclusion_count": counts['total_count'],
         "ca_mover_status": ca_mover_status,
+        "ca_mover_cache": ca_mover_cache,
         "last_mover_run": last_mover_run,
         "last_build": last_build
     })
