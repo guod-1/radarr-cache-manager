@@ -24,7 +24,7 @@ The **Cache Mount Point** setting (`/mnt/cache` by default) is used separately f
 
 ## Setup
 
-1. Add the container in Unraid Community Apps or manually via Docker
+1. Add the container in Unraid via Docker
 2. Map `/config`, `/plexcache` (optional), and your cache drive (e.g. `/mnt/cache`)
 3. Open the UI and configure Radarr/Sonarr API credentials
 4. Set your tags, path mappings, and schedule
